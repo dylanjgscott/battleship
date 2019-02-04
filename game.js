@@ -5,51 +5,51 @@ const invalid = require("./players/invalid");
 class Game {
 
     constructor(player1, player2) {
-        this.player1 = player1;
-        this.player2 = player2;
+        // Prepare player 1
+        this.currentPlayer = player1;
         try {
-            this.player1Ships = player1.getShips();
+            this.currentPlayerShips = this.currentPlayer.getShips();
         }
         catch(e) {
-            console.log("player disqualified");
-            this.player1Ships = [];
+            console.log("Invalid ships! '" + this.currentPlayer.name + "' disqualified!");
+            this.currentPlayerShips = [];
         }
+        this.currentPlayerState = new State();
+        // Prepare player 2
+        this.nextPlayer = player2;
         try {
-            this.player2Ships = player2.getShips();
+            this.nextPlayerShips = this.nextPlayer.getShips();
         }
         catch(e) {
-            console.log("player disqualified");
-            this.player2Ships = [];
+            console.log("Invalid ships! '" + this.nextPlayer.name + "' disqualified!");
+            this.nextPlayerShips = [];
         }
-        this.player1State = new State();
-        this.player2State = new State();
+        this.nextPlayerState = new State();
     }
 
     play() {
-        let currentPlayer = this.player1;
-        let currentShips = this.player2Ships;
-        let currentState = this.player1State;
-        let nextPlayer = this.player2;
-        let nextShips = this.player1Ships;
-        let nextState = this.player2State;
         while(!this.gameover) {
             try {
-                let currentShot = currentPlayer.getShot(currentState);
-                console.log(currentShot);
-                this.shoot(currentShips, currentShot, currentState);
+                let shot = this.currentPlayer.getShot(this.currentPlayerState);
+                this.shoot(this.nextPlayerShips, shot, this.currentPlayerState);
+                console.log("'" + this.currentPlayer.name + "' shot " + shot.x + " " + shot.y + ".");
             }
             catch(err) {
-                console.log("player disqualified");
+                console.log("Invalid shot! '" + this.currentPlayer.name + "' disqualified!");
+                this.currentPlayerShips = [];
             }
-            [currentPlayer, nextPlayer] = [nextPlayer, currentPlayer];
-            [currentShips, nextShips] = [nextShips, currentShips];
-            [currentState, nextState] = [nextState, currentState];
+            [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
+            [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
+            [this.currentPlayerState, this.nextPlayerState] = [this.nextPlayerState, this.currentPlayerState];
         }
-        if(this.shipsSunk(this.player1Ships)) {
-            console.log('player 2 wins');
+        if(this.shipsSunk(this.currentPlayerShips)) {
+            console.log("'" + this.nextPlayer.name +  "' wins!");
         }
-        if(this.shipsSunk(this.player2Ships)) {
-            console.log('player 1 wins');
+        else if(this.shipsSunk(this.nextPlayerShips)) {
+            console.log("'" + this.currentPlayer.name +  "' wins!");
+        }
+        else {
+            console.log("Draw?");
         }
     }
 
@@ -76,7 +76,7 @@ class Game {
     }
 
     get gameover() {
-        if(this.shipsSunk(this.player1Ships) || this.shipsSunk(this.player2Ships)) {
+        if(this.shipsSunk(this.currentPlayerShips) || this.shipsSunk(this.nextPlayerShips)) {
             return true;
         }
         else {
