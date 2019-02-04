@@ -1,13 +1,26 @@
 const battleship = require("./battleship");
-const idiot = require("./idiot");
+const idiot = require("./players/idiot");
+const invalid = require("./players/invalid");
 
 class Game {
 
     constructor(player1, player2) {
         this.player1 = player1;
         this.player2 = player2;
-        this.player1Ships = player1.getShips();
-        this.player2Ships = player2.getShips();
+        try {
+            this.player1Ships = player1.getShips();
+        }
+        catch(e) {
+            console.log("player disqualified");
+            this.player1Ships = [];
+        }
+        try {
+            this.player2Ships = player2.getShips();
+        }
+        catch(e) {
+            console.log("player disqualified");
+            this.player2Ships = [];
+        }
         this.player1State = new State();
         this.player2State = new State();
     }
@@ -20,9 +33,14 @@ class Game {
         let nextShips = this.player1Ships;
         let nextState = this.player2State;
         while(!this.gameover) {
-            let currentShot = currentPlayer.getShot(currentState);
-            console.log(currentShot);
-            this.shoot(currentShips, currentShot, currentState);
+            try {
+                let currentShot = currentPlayer.getShot(currentState);
+                console.log(currentShot);
+                this.shoot(currentShips, currentShot, currentState);
+            }
+            catch(err) {
+                console.log("player disqualified");
+            }
             [currentPlayer, nextPlayer] = [nextPlayer, currentPlayer];
             [currentShips, nextShips] = [nextShips, currentShips];
             [currentState, nextState] = [nextState, currentState];
@@ -83,6 +101,6 @@ class State {
 }
 
 player1 = new idiot.Player();
-player2 = new idiot.Player();
+player2 = new invalid.Player();
 game = new Game(player1, player2);
 game.play();
