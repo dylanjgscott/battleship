@@ -24,14 +24,16 @@ class Tournament {
         this.players.forEach(player1 => {
             this.players.forEach(player2 => {
                 if(player1 && player2) {
-                    let game = new battleship.Game(player1, player2);
-                    game.play();
-                    if(game.winner) {
-                        if(scores[game.winner]) {
-                            scores[game.winner] += 1;
-                        }
-                        else {
-                            scores[game.winner] = 1;
+                        for(let i = 0; i < 100; i++) {
+                        let game = new battleship.Game(player1, player2);
+                        game.play();
+                        if(game.winner) {
+                            if(scores[game.winner]) {
+                                scores[game.winner] += 1;
+                            }
+                            else {
+                                scores[game.winner] = 1;
+                            }
                         }
                     }
                 }
