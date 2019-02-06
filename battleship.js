@@ -9,24 +9,24 @@ class Coordinate {
 
 class Game {
 
-    constructor(player1, player2) {
+    constructor(Player1, Player2) {
         // Prepare player 1
-        this.currentPlayer = player1;
+        this.CurrentPlayer = Player1;
+        this.currentPlayer = new Player1();
         try {
-            this.currentPlayerShips = this.currentPlayer.getShips();
+            this.currentPlayerShips = this.currentPlayer.ships;
         }
         catch(e) {
-            console.log("Invalid ships! '" + this.currentPlayer.name + "' disqualified!");
             this.currentPlayerShips = [];
         }
         this.currentPlayerState = new State();
         // Prepare player 2
-        this.nextPlayer = player2;
+        this.NextPlayer = Player2;
+        this.nextPlayer = new Player2();
         try {
-            this.nextPlayerShips = this.nextPlayer.getShips();
+            this.nextPlayerShips = this.nextPlayer.ships;
         }
         catch(e) {
-            console.log("Invalid ships! '" + this.nextPlayer.name + "' disqualified!");
             this.nextPlayerShips = [];
         }
         this.nextPlayerState = new State();
@@ -35,26 +35,16 @@ class Game {
     play() {
         while(!this.gameover) {
             try {
-                let shot = this.currentPlayer.getShot(this.currentPlayerState);
+                let shot = this.currentPlayer.shoot(this.currentPlayerState);
                 this.shoot(this.nextPlayerShips, shot, this.currentPlayerState);
-                console.log("'" + this.currentPlayer.name + "' shot " + shot.x + " " + shot.y + ".");
             }
             catch(err) {
-                console.log("Invalid shot! '" + this.currentPlayer.name + "' disqualified!");
                 this.currentPlayerShips = [];
             }
+            [this.CurrentPlayer, this.NextPlayer] = [this.NextPlayer, this.CurrentPlayer];
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
             [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
             [this.currentPlayerState, this.nextPlayerState] = [this.nextPlayerState, this.currentPlayerState];
-        }
-        if(this.shipsSunk(this.currentPlayerShips)) {
-            console.log("'" + this.nextPlayer.name +  "' wins!");
-        }
-        else if(this.shipsSunk(this.nextPlayerShips)) {
-            console.log("'" + this.currentPlayer.name +  "' wins!");
-        }
-        else {
-            console.log("Draw?");
         }
     }
 
@@ -86,6 +76,24 @@ class Game {
         }
         else {
             return false;
+        }
+    }
+
+    get Winner() {
+        if(this.shipsSunk(this.currentPlayerShips)) {
+            return this.NextPlayer;
+        }
+        if(this.shipsSunk(this.nextPlayerShips)) {
+            return this.CurrentPlayer;
+        }
+    }
+
+    get Loser() {
+        if(this.shipsSunk(this.currentPlayerShips)) {
+            return this.CurrentPlayer;
+        }
+        if(this.shipsSunk(this.nextPlayerShips)) {
+            return this.NextPlayer;
         }
     }
 

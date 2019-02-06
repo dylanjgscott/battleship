@@ -2,21 +2,21 @@ const battleship = require("../battleship");
 
 class Player {
 
-    constructor() {
-        this.name = "Idiot";
+    static get name() {
+        return "Idiot";
     }
 
-    getShips() {
+    get ships() {
         return [
             new battleship.Ship(new battleship.Coordinate(0, 0), new battleship.Coordinate(0, 1)),
             new battleship.Ship(new battleship.Coordinate(1, 0), new battleship.Coordinate(1, 2)),
             new battleship.Ship(new battleship.Coordinate(2, 0), new battleship.Coordinate(2, 2)),
             new battleship.Ship(new battleship.Coordinate(3, 0), new battleship.Coordinate(3, 3)),
             new battleship.Ship(new battleship.Coordinate(4, 0), new battleship.Coordinate(4, 4)),
-        ]
+        ];
     }
 
-    getShot(state) {
+    shoot(state) {
         for(let x in state.board) {
             for(let y in state.board[x]) {
                 if(state.board[x][y] === 'ocean') {
@@ -28,4 +28,4 @@ class Player {
 
 }
 
-exports.Player = Player
+exports.Player = Player;
