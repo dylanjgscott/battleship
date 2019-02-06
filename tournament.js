@@ -7,20 +7,30 @@ const PLAYER_DIR = "./players/";
 class Tournament {
 
     constructor() {
-        this.players = fs.readdirSync(PLAYER_DIR).map(x => require(PLAYER_DIR + x).Player);
+        this.players = fs.readdirSync(PLAYER_DIR).map(file => {
+            try {
+                return require(PLAYER_DIR + file).Player;
+            }
+            catch(error){
+                fs.unlinkSync(PLAYER_DIR + file);
+                return null;
+            }
+        });
     }
 
     start() {
         let scores = {};
-        this.players.forEach((Player1) => {
-            this.players.forEach((Player2) => {
-                let game = new battleship.Game(Player1, Player2);
-                game.play();
-                if(scores[game.Winner.name]) {
-                    scores[game.Winner.name] += 1;
-                }
-                else {
-                    scores[game.Winner.name] = 1;
+        this.players.forEach(Player1 => {
+            this.players.forEach(Player2 => {
+                if(Player1 && Player2) {
+                    let game = new battleship.Game(Player1, Player2);
+                    game.play();
+                    if(scores[game.Winner.name]) {
+                        scores[game.Winner.name] += 1;
+                    }
+                    else {
+                        scores[game.Winner.name] = 1;
+                    }
                 }
             });
         });

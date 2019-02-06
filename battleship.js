@@ -16,7 +16,7 @@ class Game {
         try {
             this.currentPlayerShips = this.currentPlayer.ships;
         }
-        catch(e) {
+        catch(error) {
             this.currentPlayerShips = [];
         }
         this.currentPlayerState = new State();
@@ -26,7 +26,7 @@ class Game {
         try {
             this.nextPlayerShips = this.nextPlayer.ships;
         }
-        catch(e) {
+        catch(error) {
             this.nextPlayerShips = [];
         }
         this.nextPlayerState = new State();
@@ -38,7 +38,7 @@ class Game {
                 let shot = this.currentPlayer.shoot(this.currentPlayerState);
                 this.shoot(this.nextPlayerShips, shot, this.currentPlayerState);
             }
-            catch(err) {
+            catch(error) {
                 this.currentPlayerShips = [];
             }
             [this.CurrentPlayer, this.NextPlayer] = [this.NextPlayer, this.CurrentPlayer];
