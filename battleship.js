@@ -10,26 +10,46 @@ class Coordinate {
 class Game {
 
     constructor(player1, player2) {
+
         // Prepare player 1
         this.currentPlayer = player1;
-        this.currentPlayer.opponent = player2.name;
         try {
+            this.currentPlayerName = player1.name;
             this.currentPlayerShips = this.currentPlayer.ships;
         }
         catch(error) {
+            // Disqualify
             this.currentPlayerShips = [];
         }
         this.currentPlayerState = new State();
+
         // Prepare player 2
         this.nextPlayer = player2;
-        this.nextPlayer.opponent = player1.name;
         try {
+            this.nextPlayerName = player2.name;
             this.nextPlayerShips = this.nextPlayer.ships;
         }
         catch(error) {
+            // Disqualify
             this.nextPlayerShips = [];
         }
         this.nextPlayerState = new State();
+
+        // Introduce the players before the match
+        try {
+            this.currentPlayer.opponent = this.nextPlayerName;
+        }
+        catch(error) {
+            // Disqualify
+            this.currentPlayerShips = [];
+        }
+        try {
+            this.nextPlayer.opponent = this.currentPlayerName;
+        }
+        catch(error) {
+            // Disqualify
+            this.nextPlayerShips = [];
+        }
     }
 
     play() {
@@ -79,20 +99,30 @@ class Game {
     }
 
     get winner() {
-        if(this.shipsSunk(this.currentPlayerShips)) {
-            return this.nextPlayer;
+        try {
+            if(this.shipsSunk(this.currentPlayerShips)) {
+                return this.nextPlayer.name;
+            }
+            if(this.shipsSunk(this.nextPlayerShips)) {
+                return this.currentPlayer.name;
+            }
         }
-        if(this.shipsSunk(this.nextPlayerShips)) {
-            return this.currentPlayer;
+        catch(error) {
+            return null;
         }
     }
 
     get loser() {
-        if(this.shipsSunk(this.currentPlayerShips)) {
-            return this.currentPlayer;
+        try {
+            if(this.shipsSunk(this.currentPlayerShips)) {
+                return this.currentPlayer.name;
+            }
+            if(this.shipsSunk(this.nextPlayerShips)) {
+                return this.nextPlayer.name;
+            }
         }
-        if(this.shipsSunk(this.nextPlayerShips)) {
-            return this.nextPlayer;
+        catch(error) {
+            return null;
         }
     }
 

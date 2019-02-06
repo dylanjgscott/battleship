@@ -26,11 +26,13 @@ class Tournament {
                 if(player1 && player2) {
                     let game = new battleship.Game(player1, player2);
                     game.play();
-                    if(scores[game.winner.name]) {
-                        scores[game.winner.name] += 1;
-                    }
-                    else {
-                        scores[game.winner.name] = 1;
+                    if(game.winner) {
+                        if(scores[game.winner]) {
+                            scores[game.winner] += 1;
+                        }
+                        else {
+                            scores[game.winner] = 1;
+                        }
                     }
                 }
             });
