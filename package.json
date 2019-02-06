@@ -1,5 +1,6 @@
 {
   "name": "battleship",
+  "version": "0.0.0",
   "description": "Battleship tournament",
   "author": "Dylan Scott",
   "license": "BSD-3-Clause",

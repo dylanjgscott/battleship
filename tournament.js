@@ -8,7 +8,6 @@ class Tournament {
 
     constructor() {
         this.players = fs.readdirSync(PLAYER_DIR).map(x => require(PLAYER_DIR + x).Player);
-        this.players.forEach(x => console.log(x.Player));
     }
 
     start() {
