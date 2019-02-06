@@ -1,9 +1,9 @@
-const battleship = require("../battleship");
+const battleship = require('../battleship');
 
 class Player {
 
     get name() {
-        return "Invalid";
+        return 'Invalid';
     }
 
     get opponent() {
@@ -25,7 +25,7 @@ class Player {
     }
 
     shoot(state) {
-        throw "I don't know what to do";
+        throw "I don't know what to do!";
     }
 
 }

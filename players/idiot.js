@@ -1,9 +1,9 @@
-const battleship = require("../battleship");
+const battleship = require('../battleship');
 
 class Player {
 
     get name() {
-        return "Idiot";
+        return 'Idiot';
     }
 
     get opponent() {

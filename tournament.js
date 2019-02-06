@@ -1,8 +1,8 @@
-const fs = require("fs");
+const fs = require('fs');
 
-const battleship = require("./battleship");
+const battleship = require('./battleship');
 
-const PLAYER_DIR = "./players/";
+const PLAYER_DIR = './players/';
 
 class Tournament {
 
