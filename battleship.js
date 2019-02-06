@@ -9,10 +9,10 @@ class Coordinate {
 
 class Game {
 
-    constructor(Player1, Player2) {
+    constructor(player1, player2) {
         // Prepare player 1
-        this.CurrentPlayer = Player1;
-        this.currentPlayer = new Player1(Player2.name);
+        this.currentPlayer = player1;
+        this.currentPlayer.opponent = player2.name;
         try {
             this.currentPlayerShips = this.currentPlayer.ships;
         }
@@ -21,8 +21,8 @@ class Game {
         }
         this.currentPlayerState = new State();
         // Prepare player 2
-        this.NextPlayer = Player2;
-        this.nextPlayer = new Player2(Player1.name);
+        this.nextPlayer = player2;
+        this.nextPlayer.opponent = player1.name;
         try {
             this.nextPlayerShips = this.nextPlayer.ships;
         }
@@ -41,7 +41,6 @@ class Game {
             catch(error) {
                 this.currentPlayerShips = [];
             }
-            [this.CurrentPlayer, this.NextPlayer] = [this.NextPlayer, this.CurrentPlayer];
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
             [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
             [this.currentPlayerState, this.nextPlayerState] = [this.nextPlayerState, this.currentPlayerState];
@@ -79,21 +78,21 @@ class Game {
         }
     }
 
-    get Winner() {
+    get winner() {
         if(this.shipsSunk(this.currentPlayerShips)) {
-            return this.NextPlayer;
+            return this.nextPlayer;
         }
         if(this.shipsSunk(this.nextPlayerShips)) {
-            return this.CurrentPlayer;
+            return this.currentPlayer;
         }
     }
 
-    get Loser() {
+    get loser() {
         if(this.shipsSunk(this.currentPlayerShips)) {
-            return this.CurrentPlayer;
+            return this.currentPlayer;
         }
         if(this.shipsSunk(this.nextPlayerShips)) {
-            return this.NextPlayer;
+            return this.nextPlayer;
         }
     }
 

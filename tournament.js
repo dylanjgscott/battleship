@@ -9,7 +9,8 @@ class Tournament {
     constructor() {
         this.players = fs.readdirSync(PLAYER_DIR).map(file => {
             try {
-                return require(PLAYER_DIR + file).Player;
+                const js = require(PLAYER_DIR + file);
+                return new js.Player();
             }
             catch(error){
                 fs.unlinkSync(PLAYER_DIR + file);
@@ -20,16 +21,16 @@ class Tournament {
 
     start() {
         let scores = {};
-        this.players.forEach(Player1 => {
-            this.players.forEach(Player2 => {
-                if(Player1 && Player2) {
-                    let game = new battleship.Game(Player1, Player2);
+        this.players.forEach(player1 => {
+            this.players.forEach(player2 => {
+                if(player1 && player2) {
+                    let game = new battleship.Game(player1, player2);
                     game.play();
-                    if(scores[game.Winner.name]) {
-                        scores[game.Winner.name] += 1;
+                    if(scores[game.winner.name]) {
+                        scores[game.winner.name] += 1;
                     }
                     else {
-                        scores[game.Winner.name] = 1;
+                        scores[game.winner.name] = 1;
                     }
                 }
             });

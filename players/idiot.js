@@ -2,12 +2,16 @@ const battleship = require("../battleship");
 
 class Player {
 
-    static get name() {
+    get name() {
         return "Idiot";
     }
 
-    constructor(opponent) {
-        this.opponent = opponent;
+    get opponent() {
+        return this._opponent;
+    }
+
+    set opponent(opponent) {
+        this._opponent = opponent;
     }
 
     get ships() {
