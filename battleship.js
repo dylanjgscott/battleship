@@ -12,7 +12,7 @@ class Game {
     constructor(Player1, Player2) {
         // Prepare player 1
         this.CurrentPlayer = Player1;
-        this.currentPlayer = new Player1();
+        this.currentPlayer = new Player1(Player2.name);
         try {
             this.currentPlayerShips = this.currentPlayer.ships;
         }
@@ -22,7 +22,7 @@ class Game {
         this.currentPlayerState = new State();
         // Prepare player 2
         this.NextPlayer = Player2;
-        this.nextPlayer = new Player2();
+        this.nextPlayer = new Player2(Player1.name);
         try {
             this.nextPlayerShips = this.nextPlayer.ships;
         }

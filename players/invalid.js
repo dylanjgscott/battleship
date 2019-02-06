@@ -6,6 +6,10 @@ class Player {
         return "Invalid";
     }
 
+    constructor(opponent) {
+        this.opponent = opponent;
+    }
+
     get ships() {
         return [
             new battleship.Ship(new battleship.Coordinate(0, 0), new battleship.Coordinate(0, 1)),
