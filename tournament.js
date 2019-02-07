@@ -9,6 +9,15 @@ class Tournament {
     constructor() {
         this.players = fs.readdirSync(PLAYER_DIR).map(file => {
             try {
+                const data = fs.readFileSync(PLAYER_DIR + file);
+                const contents = data.toString();
+                let index = 0;
+                while(index = contents.substring(index).indexOf('require')) {
+                    if(!contents.substring(index).startsWith('require("../battleship");') &&
+                       !contents.substring(index).startsWith("require('../battleship');")) {
+                        throw 'Not allowed to import other files!';
+                    }
+                }
                 const js = require(PLAYER_DIR + file);
                 return new js.Player();
             }
