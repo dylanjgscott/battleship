@@ -10,7 +10,12 @@ app.get('/', (request, response) => {
     t = new tournament.Tournament();
     let players = t.start();
     let table = '<table><tr><th>Player</th><th>Score</th></td>';
-    players.forEach(player => table += '<tr><td>' + player.name + '</td><td>' + player.score + '</td></tr>');
+    players.forEach(player => {
+        try {
+            table += '<tr><td>' + player.name + '</td><td>' + player.score + '</td></tr>';
+        }
+        catch(error) {}
+    });
     table += '</table>';
     response.send(
         '<html>' +

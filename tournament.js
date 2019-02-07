@@ -12,11 +12,12 @@ class Tournament {
                 const data = fs.readFileSync(PLAYER_DIR + file);
                 const contents = data.toString();
                 let index = 0;
-                while(index = contents.substring(index).indexOf('require')) {
+                while((index = contents.substring(index).indexOf('require')) > 0) {
                     if(!contents.substring(index).startsWith('require("../battleship");') &&
                        !contents.substring(index).startsWith("require('../battleship');")) {
                         throw 'Not allowed to import other files!';
                     }
+                    index++;
                 }
                 const js = require(PLAYER_DIR + file);
                 let player = new js.Player();
@@ -40,8 +41,14 @@ class Tournament {
                 if(player1Container && player2Container) {
                     let player1 = player1Container.player;
                     let player2 = player2Container.player;
-                    player1.opponent = player2Container.name;
-                    player2.opponent = player1Container.name;
+                    try {
+                        player1.opponent = player2Container.name;
+                    }
+                    catch(error) {}
+                    try {
+                        player2.opponent = player1Container.name;
+                    }
+                    catch(error) {}
                     for(let i = 0; i < 100; i++) {
                         let game = new battleship.Game(player1, player2);
                         game.play();
