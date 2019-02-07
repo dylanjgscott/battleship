@@ -3,7 +3,7 @@ const battleship = require('../battleship');
 class Player {
 
     get name() {
-        return 'Idiot';
+        return 'Example';
     }
 
     get opponent() {
