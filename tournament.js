@@ -11,6 +11,9 @@ class Tournament {
             try {
                 const data = fs.readFileSync(PLAYER_DIR + file);
                 const contents = data.toString();
+                if(contents.indexOf('process') > 0) {
+                    throw 'No process!';
+                }
                 if(contents.indexOf('eval') > 0) {
                     throw 'No eval!';
                 }
