@@ -8,9 +8,9 @@ const upload = multer({dest: tournament.PLAYER_DIR});
 
 app.get('/', (request, response) => {
     t = new tournament.Tournament();
-    let scores = t.start();
+    let players = t.start();
     let table = '<table><tr><th>Player</th><th>Score</th></td>';
-    Object.keys(scores).forEach(player => table += '<tr><td>' + player + '</td><td>' + scores[player] + '</td></tr>');
+    players.forEach(player => table += '<tr><td>' + player.name + '</td><td>' + player.score + '</td></tr>');
     table += '</table>';
     response.send(
         '<html>' +

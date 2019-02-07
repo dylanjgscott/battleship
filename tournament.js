@@ -23,11 +23,11 @@ class Tournament {
                 let playerContainer = {
                     player: player,
                     name: player.name,
+                    score: 0,
                 }
                 return playerContainer;
             }
             catch(error){
-                console.log(error);
                 fs.unlinkSync(PLAYER_DIR + file);
                 return null;
             }
@@ -35,15 +35,6 @@ class Tournament {
     }
 
     start() {
-        let scores = {};
-        this.players.forEach(player => {
-            if(player) {
-                return scores[player.name] = 0;
-            }
-            else {
-                return null;
-            }
-        });
         this.players.forEach(player1Container => {
             this.players.forEach(player2Container => {
                 if(player1Container && player2Container) {
@@ -56,17 +47,17 @@ class Tournament {
                         game.play();
                         if(game.winner) {
                             if(game.winner == player1) {
-                                scores[player1Container.name]++;
+                                player1Container.score++;
                             }
                             if(game.winner == player2) {
-                                scores[player2Container.name]++;
+                                player2Container.score++;
                             }
                         }
                     }
                 }
             });
         });
-        return scores;
+        return this.players;
     }
 
 }
