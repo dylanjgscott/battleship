@@ -101,10 +101,10 @@ class Game {
     get winner() {
         try {
             if(this.shipsSunk(this.currentPlayerShips)) {
-                return this.nextPlayer.name;
+                return this.nextPlayer;
             }
             if(this.shipsSunk(this.nextPlayerShips)) {
-                return this.currentPlayer.name;
+                return this.currentPlayer;
             }
         }
         catch(error) {
@@ -115,10 +115,10 @@ class Game {
     get loser() {
         try {
             if(this.shipsSunk(this.currentPlayerShips)) {
-                return this.currentPlayer.name;
+                return this.currentPlayer;
             }
             if(this.shipsSunk(this.nextPlayerShips)) {
-                return this.nextPlayer.name;
+                return this.nextPlayer;
             }
         }
         catch(error) {

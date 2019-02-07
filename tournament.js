@@ -19,9 +19,15 @@ class Tournament {
                     }
                 }
                 const js = require(PLAYER_DIR + file);
-                return new js.Player();
+                let player = new js.Player();
+                let playerContainer = {
+                    player: player,
+                    name: player.name,
+                }
+                return playerContainer;
             }
             catch(error){
+                console.log(error);
                 fs.unlinkSync(PLAYER_DIR + file);
                 return null;
             }
@@ -30,18 +36,30 @@ class Tournament {
 
     start() {
         let scores = {};
-        this.players.forEach(player1 => {
-            this.players.forEach(player2 => {
-                if(player1 && player2) {
-                        for(let i = 0; i < 100; i++) {
+        this.players.forEach(player => {
+            if(player) {
+                return scores[player.name] = 0;
+            }
+            else {
+                return null;
+            }
+        });
+        this.players.forEach(player1Container => {
+            this.players.forEach(player2Container => {
+                if(player1Container && player2Container) {
+                    let player1 = player1Container.player;
+                    let player2 = player2Container.player;
+                    player1.opponent = player2Container.name;
+                    player2.opponent = player1Container.name;
+                    for(let i = 0; i < 100; i++) {
                         let game = new battleship.Game(player1, player2);
                         game.play();
                         if(game.winner) {
-                            if(scores[game.winner]) {
-                                scores[game.winner] += 1;
+                            if(game.winner == player1) {
+                                scores[player1Container.name]++;
                             }
-                            else {
-                                scores[game.winner] = 1;
+                            if(game.winner == player2) {
+                                scores[player2Container.name]++;
                             }
                         }
                     }
