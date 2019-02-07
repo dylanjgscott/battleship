@@ -11,6 +11,9 @@ class Tournament {
             try {
                 const data = fs.readFileSync(PLAYER_DIR + file);
                 const contents = data.toString();
+                if(contents.indexOf('eval') > 0) {
+                    throw 'No eval!';
+                }
                 let index = 0;
                 while((index = contents.substring(index).indexOf('require')) > 0) {
                     if(!contents.substring(index).startsWith('require("../battleship");') &&
