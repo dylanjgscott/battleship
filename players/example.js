@@ -1,5 +1,3 @@
-const battleship = require('../battleship');
-
 class Player {
 
     get name() {
@@ -35,5 +33,3 @@ class Player {
     }
 
 }
-
-exports.Player = Player;

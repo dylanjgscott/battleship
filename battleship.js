@@ -13,52 +13,23 @@ class Game {
 
         // Prepare player 1
         this.currentPlayer = player1;
-        try {
-            this.currentPlayerName = player1.name;
-            this.currentPlayerShips = this.currentPlayer.ships;
-        }
-        catch(error) {
-            // Disqualify
-            this.currentPlayerShips = [];
-        }
-        this.currentPlayerState = new State();
-
+        this.currentPlayerShips = player1.vm.run('player.ships');
+        this.currentPlayerState = player1.vm.run('state = new battleship.State()');
+        
         // Prepare player 2
         this.nextPlayer = player2;
-        try {
-            this.nextPlayerName = player2.name;
-            this.nextPlayerShips = this.nextPlayer.ships;
-        }
-        catch(error) {
-            // Disqualify
-            this.nextPlayerShips = [];
-        }
-        this.nextPlayerState = new State();
-
-        // Introduce the players before the match
-        try {
-            this.currentPlayer.opponent = this.nextPlayerName;
-        }
-        catch(error) {
-            // Disqualify
-            this.currentPlayerShips = [];
-        }
-        try {
-            this.nextPlayer.opponent = this.currentPlayerName;
-        }
-        catch(error) {
-            // Disqualify
-            this.nextPlayerShips = [];
-        }
+        this.nextPlayerShips = player2.vm.run('player.ships');
+        this.nextPlayerState = player2.vm.run('state = new battleship.State()');
     }
 
     play() {
         while(!this.gameover) {
             try {
-                let shot = this.currentPlayer.shoot(this.currentPlayerState);
+                let shot = this.currentPlayer.vm.run('player.shoot(state)');
                 this.shoot(this.nextPlayerShips, shot, this.currentPlayerState);
             }
             catch(error) {
+                console.log(error);
                 this.currentPlayerShips = [];
             }
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
@@ -108,20 +79,7 @@ class Game {
             }
         }
         catch(error) {
-            return null;
-        }
-    }
-
-    get loser() {
-        try {
-            if(this.shipsSunk(this.currentPlayerShips)) {
-                return this.currentPlayer;
-            }
-            if(this.shipsSunk(this.nextPlayerShips)) {
-                return this.nextPlayer;
-            }
-        }
-        catch(error) {
+            console.log(error);
             return null;
         }
     }
