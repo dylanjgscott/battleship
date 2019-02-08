@@ -41,17 +41,18 @@ class Tournament {
         this.players.forEach(player1 => {
             this.players.forEach(player2 => {
                 if(player1 && player2 ) {
-                    console.log(player1.name + ' vs ' + player2.name);
-                    player1.vm.run('player.opponent = "' + player2.name + '"');
-                    player2.vm.run('player.opponent = "' + player1.name + '"');
-                    let game = new battleship.Game(player1, player2);
-                    game.play();
-                    if(game.winner) {
-                        if(game.winner == player1) {
-                            player1.score++;
-                        }
-                        if(game.winner == player2) {
-                            player2.score++;
+                    for(let i = 0; i < 10; i++) {
+                        player1.vm.run('player.opponent = "' + player2.name + '"');
+                        player2.vm.run('player.opponent = "' + player1.name + '"');
+                        let game = new battleship.Game(player1, player2);
+                        game.play();
+                        if(game.winner) {
+                            if(game.winner == player1) {
+                                player1.score++;
+                            }
+                            if(game.winner == player2) {
+                                player2.score++;
+                            }
                         }
                     }
                 }
@@ -62,4 +63,5 @@ class Tournament {
 
 }
 
+exports.PLAYER_DIR = PLAYER_DIR;
 exports.Tournament = Tournament;
