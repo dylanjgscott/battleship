@@ -1,0 +1,76 @@
+class Player {
+
+    get name() {
+        return 'KILLBOT3000 MK 2';
+    }
+
+    get opponent() {
+        return this._opponent;
+    }
+
+    set opponent(opponent) {
+        this._opponent = opponent;
+    }
+
+    get ships() {
+        return {
+            carrier: new battleship.Ship(new battleship.Coordinate(4, 5), new battleship.Coordinate(4, 9)),
+            battleship: new battleship.Ship(new battleship.Coordinate(3, 0), new battleship.Coordinate(3, 3)),
+            cruiser: new battleship.Ship(new battleship.Coordinate(2, 0), new battleship.Coordinate(2, 2)),
+            submarine: new battleship.Ship(new battleship.Coordinate(1, 0), new battleship.Coordinate(1, 2)),
+            destroyer: new battleship.Ship(new battleship.Coordinate(9, 8), new battleship.Coordinate(9, 9)),
+        };
+    }
+
+    shoot(state) {
+        // Shoot near existing hits
+        for(let x in state.board) {
+            for(let y in state.board[x]) {
+                if(state.board[x][y] === 'hit') {
+                    try{
+                        if(state.board[x+1][y] === 'ocean') {
+                            return new battleship.Shot(x+1, y);
+                        }
+                    }
+                    catch {}
+                    try{
+                        if(state.board[x-1][y] === 'ocean') {
+                            return new battleship.Shot(x-1, y);
+                        }
+                    }
+                    catch {}
+                    try{
+                        if(state.board[x][y+1] === 'ocean') {
+                            return new battleship.Shot(x, y+1);
+                        }
+                    }
+                    catch {}
+                    try {
+                        if(state.board[x][y-1] === 'ocean') {
+                            return new battleship.Shot(x, y-1);
+                        }
+                    }
+                    catch {}
+                }
+            }
+        }
+        // Shoot a checkerboard pattern
+        for(let x in state.board) {
+            for(let y in state.board[x]) {
+                if(state.board[x][y] === 'ocean') {
+                    if(x % 2 === 0) {
+                        if(y % 2 === 0) {
+                            return new battleship.Shot(x, y);
+                        }
+                    }
+                    if(x % 2 === 1) {
+                        if(y % 2 === 1) {
+                            return new battleship.Shot(x, y);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

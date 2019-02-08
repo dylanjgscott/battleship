@@ -40,7 +40,7 @@ class Tournament {
     start() {
         this.players.forEach(player1 => {
             this.players.forEach(player2 => {
-                if(player1 && player2 ) {
+                if(player1 && player2 && player1 != player2) {
                     for(let i = 0; i < 10; i++) {
                         player1.vm.run('player.opponent = "' + player2.name + '"');
                         player2.vm.run('player.opponent = "' + player1.name + '"');

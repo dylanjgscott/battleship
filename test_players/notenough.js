@@ -1,7 +1,7 @@
 class Player {
 
     get name() {
-        return 'Example';
+        return 'Not enough';
     }
 
     get opponent() {
@@ -14,7 +14,6 @@ class Player {
 
     get ships() {
         return {
-            carrier: new battleship.Ship(new battleship.Coordinate(4, 0), new battleship.Coordinate(4, 4)),
             battleship: new battleship.Ship(new battleship.Coordinate(3, 0), new battleship.Coordinate(3, 3)),
             cruiser: new battleship.Ship(new battleship.Coordinate(1, 0), new battleship.Coordinate(1, 2)),
             submarine: new battleship.Ship(new battleship.Coordinate(2, 0), new battleship.Coordinate(2, 2)),

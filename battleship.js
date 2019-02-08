@@ -1,3 +1,11 @@
+const SHIPS = {
+    carrier: 5,
+    battleship: 4,
+    cruiser: 3,
+    submarine: 3,
+    destroyer: 2,
+}
+
 class Coordinate {
 
     constructor(x, y) {
@@ -13,13 +21,19 @@ class Game {
 
         // Prepare player 1
         this.currentPlayer = player1;
-        this.currentPlayerShips = player1.vm.run('player.ships');
-        this.currentPlayerState = player1.vm.run('state = new battleship.State()');
+        this.currentPlayer.ships = player1.vm.run('player.ships');
+        this.currentPlayer.state = player1.vm.run('state = new battleship.State()');
+        if(!this.shipsValid(this.currentPlayer.ships)) {
+            this.currentPlayer.ships = {};
+        }
         
         // Prepare player 2
         this.nextPlayer = player2;
-        this.nextPlayerShips = player2.vm.run('player.ships');
-        this.nextPlayerState = player2.vm.run('state = new battleship.State()');
+        this.nextPlayer.ships = player2.vm.run('player.ships');
+        this.nextPlayer.state = player2.vm.run('state = new battleship.State()');
+        if(!this.shipsValid(this.nextPlayer.ships)) {
+            this.nextPlayer.ships = {};
+        }
     }
 
     play() {
@@ -30,7 +44,7 @@ class Game {
             }
             catch(error) {
                 console.log(error);
-                this.currentPlayerShips = [];
+                this.currentPlayer.ships = {};
             }
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
             [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
@@ -39,28 +53,72 @@ class Game {
     }
 
     shoot(shot) {
-        if(this.nextPlayerShips.some(ship => ship.checkShot(shot))) {
-            this.currentPlayerState.board[shot.x][shot.y] = 'hit';
+        if(Object.values(this.nextPlayer.ships).some(ship => ship.checkShot(shot))) {
+            this.currentPlayer.state.board[shot.x][shot.y] = 'hit';
         }
         else {
-            this.currentPlayerState.board[shot.x][shot.y] = 'miss';
+            this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
         }
     }
 
     shipsSunk(ships) {
-        return ships.every(ship => ship.sunk);
+        return Object.values(ships).every(ship => ship.sunk);
+    }
+
+    shipsValid(ships) {
+        try {
+            if(Object.keys(ships).length !== Object.keys(SHIPS).length) {
+                console.log('incorrect number of ships!');
+                return false;
+            }
+            for(let i in Object.keys(SHIPS)) {
+                let key = Object.keys(SHIPS)[i];
+                console.log('key: '+ key);
+                if(SHIPS[key] !== ships[key].size) {
+                    console.log('invalid ship size!');
+                    return false;
+                }
+            }
+            if(!Object.values(ships).every(ship => ship.valid)) {
+                console.log('invalid ship found!');
+                return false;
+            }
+            for(let i = 0; i < Object.values(ships).length-1; i++) {
+                for(let j = i+1; j < Object.values(ships).length; j++) {
+                    if(this.shipsCollide(Object.values(ships)[i], Object.values(ships)[j])) {
+                        console.log('ships collide!');
+                        return false;
+                    }
+                }
+            }
+        }
+        catch(error) {
+            console.log(error);
+            return false;
+        }
+        return true;
+    }
+
+    shipsCollide(ship1, ship2) {
+        if(ship1.start.x > ship2.end.x || ship2.start.x > ship1.end.x) {
+            return false;
+        }
+        if(ship1.start.y > ship2.end.y || ship2.start.y > ship1.end.y) {
+            return false;
+        }
+        return true;
     }
 
     get gameover() {
-        return this.shipsSunk(this.currentPlayerShips) || this.shipsSunk(this.nextPlayerShips);
+        return this.shipsSunk(this.currentPlayer.ships) || this.shipsSunk(this.nextPlayer.ships);
     }
 
     get winner() {
-        if(this.shipsSunk(this.currentPlayerShips)) {
-            return this.nextPlayer;
-        }
-        if(this.shipsSunk(this.nextPlayerShips)) {
+        if(!this.shipsSunk(this.currentPlayer.ships) && this.shipsSunk(this.nextPlayer.ships)) {
             return this.currentPlayer;
+        }
+        if(!this.shipsSunk(this.nextPlayer.ships) && this.shipsSunk(this.currentPlayer.ships)) {
+            return this.nextPlayer;
         }
         return null;
     }
@@ -114,6 +172,38 @@ class Ship {
         return (this.end.x - this.start.x + 1) * (this.end.y - this.start.y + 1);
     }
 
+    get valid() {
+        try{
+            // must be integral
+            if(this.start.x !== Math.floor(this.start.x) ||
+               this.start.y !== Math.floor(this.start.y) ||
+               this.end.x !== Math.floor(this.end.x) ||
+               this.start.y !== Math.floor(this.start.y)) {
+                console.log('non-integral ship!');
+                return false;
+            }
+            // must be on board
+            if(this.start.x < 0 || this.start.x > 9 ||
+               this.start.y < 0 || this.start.y > 9 ||
+               this.end.x < 0 || this.end.x > 9 ||
+               this.end.y < 0 || this.end.y > 9) {
+                console.log('ship placed outside board!');
+                return false;
+            }
+            // must not be too wide
+            if(this.start.x !== this.end.x && this.start.y != this.end.y){
+                console.log('ship too wide!');
+                return false;
+            }
+        }
+        catch(error) {
+            console.log(error);
+            return false;
+        }
+        // i guess it's fine
+        return true;
+    }
+
 }
 
 class State {
@@ -126,29 +216,12 @@ class State {
                 this.board[x][y] = 'ocean';
             }
         }
-    }
-
-    toString() {
-        let string = "";
-        this.board.forEach(x => {
-            x.forEach(y => {
-                if(y === 'ocean') {
-                    string += 'O';
-                }
-                if(y === 'miss') {
-                    string += 'M';
-                }
-                if(y === 'hit') {
-                    string += 'H';
-                }
-            });
-            string += '\n';
-        });
-        return string;
+        this.ships = Object.keys(SHIPS);
     }
 
 }
 
+exports.SHIPS = SHIPS;
 exports.Coordinate = Coordinate;
 exports.Game = Game;
 exports.Ship = Ship;
