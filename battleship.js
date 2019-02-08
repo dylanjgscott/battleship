@@ -26,7 +26,7 @@ class Game {
         while(!this.gameover) {
             try {
                 let shot = this.currentPlayer.vm.run('player.shoot(state)');
-                this.shoot(this.nextPlayerShips, shot, this.currentPlayerState);
+                this.shoot(shot);
             }
             catch(error) {
                 console.log(error);
@@ -38,50 +38,31 @@ class Game {
         }
     }
 
-    shoot(ships, shot, state) {
-        for(let i in ships) {
-            let ship = ships[i];
-            if(ship.checkShot(shot)) {
-                state.board[shot.x][shot.y] = 'hit';
-            }
-            else {
-                state.board[shot.x][shot.y] = 'miss';
-            }
+    shoot(shot) {
+        if(this.nextPlayerShips.some(ship => ship.checkShot(shot))) {
+            this.currentPlayerState.board[shot.x][shot.y] = 'hit';
+        }
+        else {
+            this.currentPlayerState.board[shot.x][shot.y] = 'miss';
         }
     }
 
     shipsSunk(ships) {
-        for(let i in ships) {
-            let ship = ships[i];
-            if(!ship.sunk) {
-                return false;
-            }
-        }
-        return true;
+        return ships.every(ship => ship.sunk);
     }
 
     get gameover() {
-        if(this.shipsSunk(this.currentPlayerShips) || this.shipsSunk(this.nextPlayerShips)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return this.shipsSunk(this.currentPlayerShips) || this.shipsSunk(this.nextPlayerShips);
     }
 
     get winner() {
-        try {
-            if(this.shipsSunk(this.currentPlayerShips)) {
-                return this.nextPlayer;
-            }
-            if(this.shipsSunk(this.nextPlayerShips)) {
-                return this.currentPlayer;
-            }
+        if(this.shipsSunk(this.currentPlayerShips)) {
+            return this.nextPlayer;
         }
-        catch(error) {
-            console.log(error);
-            return null;
+        if(this.shipsSunk(this.nextPlayerShips)) {
+            return this.currentPlayer;
         }
+        return null;
     }
 
 }
@@ -115,11 +96,8 @@ class Ship {
             return false;
         }
         // already hit there
-        for(let i in this.hits) {
-            let hit = this.hits[i];
-            if(shot.x == hit.x && shot.y == hit.y) {
-                return false;
-            }
+        if(this.hits.some(hit => hit.x === shot.x && hit.y == shot.y)) {
+            return false;
         }
         // ok it was a hit so remember where
         this.hits.push(shot);
@@ -128,15 +106,7 @@ class Ship {
 
     // ship status
     get sunk() {
-        // floating
-        if(this.hits.length < this.size) {
-            return false;
-        }
-        // sunk
-        else {
-            return true;
-        }
-
+        return this.hits.length >= this.size;
     }
 
     // number of squares occupied by ship
@@ -156,6 +126,25 @@ class State {
                 this.board[x][y] = 'ocean';
             }
         }
+    }
+
+    toString() {
+        let string = "";
+        this.board.forEach(x => {
+            x.forEach(y => {
+                if(y === 'ocean') {
+                    string += 'O';
+                }
+                if(y === 'miss') {
+                    string += 'M';
+                }
+                if(y === 'hit') {
+                    string += 'H';
+                }
+            });
+            string += '\n';
+        });
+        return string;
     }
 
 }
