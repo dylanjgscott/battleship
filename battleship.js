@@ -138,20 +138,20 @@ class Game {
                 let shot = this.currentPlayer.vm.run('player.shoot(state)');
                 // take a turn
                 this.turn(shot);
-                // opponent ships sunk
-                if(Game.shipsSunk(this.nextPlayer.ships)) {
-                    // player ships still afloat
-                    if(!Game.shipsSunk(this.currentPlayer.ships)) {
-                        // winner winner chicken dinner
-                        return this.currentPlayer.player;
-                    }
-                    // both players ships sunk, invalid match
-                    return null;
-                }
             }
             catch(error) {
                 // disqualification
                 this.currentPlayer.ships = {};
+            }
+            // opponent ships sunk
+            if(Game.shipsSunk(this.nextPlayer.ships)) {
+                // player ships still afloat
+                if(!Game.shipsSunk(this.currentPlayer.ships)) {
+                    // winner winner chicken dinner
+                    return this.currentPlayer.player;
+                }
+                // both players ships sunk, invalid match
+                return null;
             }
             // swap players
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];

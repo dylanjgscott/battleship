@@ -7,13 +7,13 @@ class Game extends React.Component {
                 <h2>Winner: {this.props.winner.name}!</h2>
                 <h3>{this.props.game.player1.player.name}'s Board</h3>
                 <table>
-                    {this.props.game.player1.state.board.map(x => {
+                    {Array.from(Array(10).keys()).map(x => {
                         return (
                             <tr key={x}>
-                                {x.map(y => {
+                                {Array.from(Array(10).keys()).map(y => {
                                     return (
                                         <td key={y}>
-                                            <img src={'/static/' + y + '.png'} />
+                                            <img src={'/static/' + this.props.game.player1.state.board[x][y] + '.png'} />
                                         </td>
                                     );
                                 })}
@@ -23,13 +23,13 @@ class Game extends React.Component {
                 </table>
                 <h3>{this.props.game.player2.player.name}'s Board</h3>
                 <table>
-                    {this.props.game.player2.state.board.map(x => {
+                    {Array.from(Array(10).keys()).map(x => {
                         return (
                             <tr key={x}>
-                                {x.map(y => {
+                                {Array.from(Array(10).keys()).map(y => {
                                     return (
                                         <td key={y}>
-                                            <img src={'/static/' + y + '.png'} />
+                                            <img src={'/static/' + this.props.game.player2.state.board[x][y] + '.png'} />
                                         </td>
                                     );
                                 })}

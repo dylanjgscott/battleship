@@ -34,9 +34,10 @@ class Tournament {
     }
 
     constructor(directory) {
-        this.players = fs.readdirSync(directory).map(filename => {
+        let players = fs.readdirSync(directory).map(filename => {
             return Tournament.loadPlayer(directory, filename);
         });
+        this.players = players.filter(player => player != null);
     }
 
     results() {
@@ -44,8 +45,14 @@ class Tournament {
             this.players.forEach(player2 => {
                 if(player1 && player2 && player1 != player2) {
                     for(let i = 0; i < 10; i++) {
-                        player1.vm.run('player.opponent = ' + JSON.stringify(player2.name));
-                        player2.vm.run('player.opponent = ' + JSON.stringify(player1.name));
+                        try {
+                            player1.vm.run('player.opponent = ' + JSON.stringify(player2.name));
+                        }
+                        catch(error) {}
+                        try {
+                            player2.vm.run('player.opponent = ' + JSON.stringify(player1.name));
+                        }
+                        catch(error) {}
                         let game = new battleship.Game(player1, player2);
                         if(game.winner) {
                             if(game.winner == player1) {

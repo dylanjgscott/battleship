@@ -1,7 +1,7 @@
 class Player {
 
     get name() {
-        return 'Invalid Ships';
+        return 'Error Ships';
     }
 
     get opponent() {
@@ -13,7 +13,7 @@ class Player {
     }
 
     get ships() {
-        return null;
+        throw 'test';
     }
 
     shoot(state) {
