@@ -144,7 +144,7 @@ class Ship {
     }
 
     // check if a shot hits or not
-    checkShot(shot) {
+    hit(shot) {
         // x too wide
         if(shot.x < this.start.x || shot.x > this.end.x) {
             return false;
@@ -162,24 +162,22 @@ class Ship {
         return true;
     }
 
-    // ship status
-    get sunk() {
-        return this.hits.length >= this.size;
-    }
-
     // number of squares occupied by ship
     get size() {
         return (this.end.x - this.start.x + 1) * (this.end.y - this.start.y + 1);
     }
 
+    // ship status
+    get sunk() {
+        return this.hits.length >= this.size;
+    }
     get valid() {
         try{
             // must be integral
             if(this.start.x !== Math.floor(this.start.x) ||
                this.start.y !== Math.floor(this.start.y) ||
                this.end.x !== Math.floor(this.end.x) ||
-               this.start.y !== Math.floor(this.start.y)) {
-                console.log('non-integral ship!');
+               this.end.y !== Math.floor(this.end.y)) {
                 return false;
             }
             // must be on board
@@ -187,12 +185,10 @@ class Ship {
                this.start.y < 0 || this.start.y > 9 ||
                this.end.x < 0 || this.end.x > 9 ||
                this.end.y < 0 || this.end.y > 9) {
-                console.log('ship placed outside board!');
                 return false;
             }
             // must not be too wide
             if(this.start.x !== this.end.x && this.start.y != this.end.y){
-                console.log('ship too wide!');
                 return false;
             }
         }
