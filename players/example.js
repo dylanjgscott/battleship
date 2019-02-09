@@ -1,15 +1,16 @@
 // example battleship player class
 //
 // general info:
-//
+// - battleships!
+// - provide javascript functions below to place your ships and shoot the enemy
+// - winner takes all
 // - the playing field is a 10 by 10 grid starting at (0,0) and finishing at (9,9)
-// - provide javascripts functions below to place your ships and shoot the enemy
 // - the battleship module is loaded for you
 // - all coordinate values must be integers (0,1,2,3,4,5,6,7,8,9)
 // - all coordinates must be within the board
 // - throwing an exception will lose the match
 // - taking more than 1000ms will lose the match
-// - run the server locally for testing your players if you want
+// - run the server locally for testing your players if you want `node server.js`
 
 class Player {
 
