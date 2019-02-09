@@ -54,8 +54,9 @@ class Player {
     //
     // state.board is a 10 by 10 array which can be one of 3 values:
     // - 'ocean': a square you have not shot
-    // - 'hit': a square you have shot and hit a ship
     // - 'miss': a square you have shot but no ship is present
+    // - 'hit': a square you have shot and hit a ship but the ship is still afloat
+    // - 'sunk': a square you have shot and hit and the ship has sunk
     //
     // state.ships is an array of ship names which the opponent still has in play
     // the possible values in the array are:

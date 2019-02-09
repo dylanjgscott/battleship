@@ -113,6 +113,16 @@ class Game {
             if(Object.values(this.nextPlayer.ships).some(ship => ship.hit(shot))) {
                 // update board state
                 this.currentPlayer.state.board[shot.x][shot.y] = 'hit';
+                Object.keys(this.nextPlayer.ships).forEach(shipName => {
+                    let ship = this.nextPlayer.ships[shipName];
+                    if(ship.sunk) {
+                        for(let x = ship.start.x; x <= ship.end.x; x++) {
+                            for(let y = ship.start.y; y <= ship.end.y; y++) {
+                                this.currentPlayer.state.board[x][y] = 'sunk';
+                            }
+                        }
+                    }
+                });
                 // update ship state
                 this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => {
                     return !this.nextPlayer.ships[shipName].sunk;

@@ -108,6 +108,14 @@ describe('Game', () => {
             this.game.turn(new battleship.Shot(0, 1));
             assert(!this.game.currentPlayer.state.ships.includes('destroyer'));
         });
+        it('updates the board on sink', () => {
+            assert.equal(this.game.currentPlayer.state.board[0][0], 'ocean');
+            assert.equal(this.game.currentPlayer.state.board[0][1], 'ocean');
+            this.game.turn(new battleship.Shot(0, 0));
+            this.game.turn(new battleship.Shot(0, 1));
+            assert.equal(this.game.currentPlayer.state.board[0][0], 'sunk');
+            assert.equal(this.game.currentPlayer.state.board[0][1], 'sunk');
+        });
         it('disqualifies on non-shot', () => {
             this.game.turn(null);
             assert.deepStrictEqual(this.game.currentPlayer.ships, {});
