@@ -22,7 +22,7 @@ const FOOTER = '</body>' +
                '</html>'
 
 const app = express();
-const upload = multer({dest: tournament.PLAYER_DIR});
+const upload = multer({dest: PLAYER_DIR});
 
 app.use('/static', express.static('static'));
 
