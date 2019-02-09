@@ -40,7 +40,7 @@ class Tournament {
         });
     }
 
-    start() {
+    scoreboard() {
         this.players.forEach(player1 => {
             this.players.forEach(player2 => {
                 if(player1 && player2 && player1 != player2) {
