@@ -71,77 +71,89 @@ class Game {
     }
 
     constructor(player1, player2) {
-
         // Prepare player 1
-        this.currentPlayer = player1;
-        this.currentPlayer.ships = player1.vm.run('player.ships');
-        this.currentPlayer.state = player1.vm.run('state = new battleship.State()');
-        if(!Game.shipsValid(this.currentPlayer.ships)) {
+        this.currentPlayer = {};
+        try {
+            this.currentPlayer.player = player1;
+            this.currentPlayer.ships = player1.vm.run('player.ships');
+            this.currentPlayer.state = player1.vm.run('state = new battleship.State()');
+            this.currentPlayer.vm = player1.vm;
+            if(!Game.shipsValid(this.currentPlayer.ships)) {
+                throw 'invalid ships';
+            }
+        }
+        catch(error) {
             this.currentPlayer.ships = {};
         }
-        
         // Prepare player 2
-        this.nextPlayer = player2;
-        this.nextPlayer.ships = player2.vm.run('player.ships');
-        this.nextPlayer.state = player2.vm.run('state = new battleship.State()');
-        if(!Game.shipsValid(this.nextPlayer.ships)) {
+        this.nextPlayer = {};
+        try {
+            this.nextPlayer.player = player2;
+            this.nextPlayer.ships = player2.vm.run('player.ships');
+            this.nextPlayer.state = player2.vm.run('state = new battleship.State()');
+            this.nextPlayer.vm = player2.vm;
+            if(!Game.shipsValid(this.nextPlayer.ships)) {
+                throw 'invalid ships';
+            }
+        }
+        catch(error) {
             this.nextPlayer.ships = {};
         }
     }
 
-    play() {
-        // play until someone wins
-        while(!this.gameover) {
-            try {
-                // get the current players shot
-                let shot = this.currentPlayer.vm.run('player.shoot(state)');
-                this.shoot(shot);
+    turn(shot) {
+        try {
+            // make sure the shot is valid and hits ocean
+            if(!shot.valid || this.currentPlayer.state.board[shot.x][shot.y] !== 'ocean') {
+                throw 'invalid shot';
             }
-            // throwing an exception on your turn is a disqualification
+            // shot hits
+            if(Object.values(this.nextPlayer.ships).some(ship => ship.hit(shot))) {
+                // update board state
+                this.currentPlayer.state.board[shot.x][shot.y] = 'hit';
+                // update ship state
+                this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => {
+                    return !this.nextPlayer.ships[shipName].sunk;
+                });
+            }
+            // shot misses
+            else {
+                // update board state
+                this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
+            }
+        }
+        catch(error) {
+            // disqualification
+            this.currentPlayer.ships = {};
+        }
+    }
+
+    get winner() {
+        // play until someone wins
+        while(true) {
+            try {
+                // get the players shot
+                let shot = this.currentPlayer.vm.run('player.shoot(state)');
+                // take a turn
+                this.turn(shot);
+                // opponent ships sunk
+                if(Game.shipsSunk(this.nextPlayer.ships)) {
+                    // player ships still afloat
+                    if(!Game.shipsSunk(this.currentPlayer.ships)) {
+                        // winner winner chicken dinner
+                        return this.currentPlayer.player;
+                    }
+                    // both players ships sunk, invalid match
+                    return null;
+                }
+            }
             catch(error) {
-                console.log(error);
+                // disqualification
                 this.currentPlayer.ships = {};
             }
             // swap players
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
-            [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
-            [this.currentPlayerState, this.nextPlayerState] = [this.nextPlayerState, this.currentPlayerState];
         }
-    }
-
-    shoot(shot) {
-        // hit
-        if(Object.values(this.nextPlayer.ships).some(ship => ship.hit(shot))) {
-            // update board state
-            this.currentPlayer.state.board[shot.x][shot.y] = 'hit';
-            // update ship state
-            this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => {
-                return !this.nextPlayer.ships[shipName].sunk;
-            });
-        }
-        // miss
-        else {
-            // update board state
-            this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
-        }
-    }
-
-    get gameover() {
-        // check if either player has all ships sunk
-        return Game.shipsSunk(this.currentPlayer.ships) || Game.shipsSunk(this.nextPlayer.ships);
-    }
-
-    get winner() {
-        this.play();
-        // opponent ships must be sunk and your ships must not be sunk
-        if(!Game.shipsSunk(this.currentPlayer.ships) && Game.shipsSunk(this.nextPlayer.ships)) {
-            return this.currentPlayer;
-        }
-        if(!Game.shipsSunk(this.nextPlayer.ships) && Game.shipsSunk(this.currentPlayer.ships)) {
-            return this.nextPlayer;
-        }
-        // no winnder
-        return null;
     }
 
 }
@@ -190,7 +202,7 @@ class Ship {
             return false;
         }
         // already hit there
-        if(this.hits.some(hit => hit.x === shot.x && hit.y == shot.y)) {
+        if(this.hits.some(hit => hit.x === shot.x && hit.y === shot.y)) {
             return false;
         }
         // ok it was a hit so remember where
@@ -222,7 +234,6 @@ class Ship {
         }
         // throwing an error is invalid
         catch(error) {
-            console.log(error);
             return false;
         }
         // i guess it's ok

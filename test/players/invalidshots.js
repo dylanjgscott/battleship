@@ -1,7 +1,7 @@
 class Player {
 
     get name() {
-        return 'Valid';
+        return 'Invalid Shots';
     }
 
     get opponent() {
@@ -23,13 +23,7 @@ class Player {
     }
 
     shoot(state) {
-        for(let x = 0; x < 10; x++) {
-            for(let y = 0; y < 10; y++) {
-                if(state.board[x][y] === 'ocean') {
-                    return new battleship.Shot(x, y);
-                }
-            }
-        }
+        return null;
     }
 
 }

@@ -30,7 +30,6 @@ class Tournament {
             return playerContainer;
         }
         catch(error){
-            console.log(error);
             return null;
         }
     }
