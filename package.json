@@ -5,6 +5,7 @@
     "author": "Dylan Scott",
     "license": "BSD-3-Clause",
     "dependencies": {
+        "escape-html": "^1.0.3",
         "express": "^4.16.4",
         "multer": "^1.4.1",
         "vm2": "^3.6.10"

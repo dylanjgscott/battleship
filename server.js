@@ -1,3 +1,4 @@
+const escapeHtml = require('escape-html');
 const express = require('express');
 const multer = require('multer');
 
@@ -12,7 +13,7 @@ app.get('/', (request, response) => {
     let table = '<table><tr><th>Player</th><th>Score</th></td>';
     players.forEach(player => {
         try {
-            table += '<tr><td>' + player.name + '</td><td>' + player.score + '</td></tr>';
+            table += '<tr><td>' + escapeHtml(player.name) + '</td><td>' + player.score + '</td></tr>';
         }
         catch(error) {}
     });

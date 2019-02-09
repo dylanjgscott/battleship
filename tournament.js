@@ -45,8 +45,8 @@ class Tournament {
             this.players.forEach(player2 => {
                 if(player1 && player2 && player1 != player2) {
                     for(let i = 0; i < 10; i++) {
-                        player1.vm.run('player.opponent = "' + player2.name + '"');
-                        player2.vm.run('player.opponent = "' + player1.name + '"');
+                        player1.vm.run('player.opponent = ' + JSON.stringify(player2.name));
+                        player2.vm.run('player.opponent = ' + JSON.stringify(player1.name));
                         let game = new battleship.Game(player1, player2);
                         if(game.winner) {
                             if(game.winner == player1) {
