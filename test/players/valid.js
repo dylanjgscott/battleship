@@ -1,7 +1,7 @@
 class Player {
 
     get name() {
-        return 'Example';
+        return 'Valid';
     }
 
     get opponent() {

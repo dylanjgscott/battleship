@@ -4,15 +4,40 @@ const battleship = require('../battleship');
 
 describe('Ship', () => {
 
-    describe('hit', () => {
-        it('should not hit a ship with a bad shot', () => {
+    describe('#collides()', () => {
+        it('does not collide ships which do not overlap', () => {
+            let ship1 = new battleship.Ship(
+                new battleship.Coordinate(0, 0),
+                new battleship.Coordinate(0, 1),
+            );
+            let ship2 = new battleship.Ship(
+                new battleship.Coordinate(1, 0),
+                new battleship.Coordinate(1, 1),
+            );
+            assert(!ship1.collides(ship2));
+        });
+        it('collides ships which do overlap', () => {
+            let ship1 = new battleship.Ship(
+                new battleship.Coordinate(0, 0),
+                new battleship.Coordinate(0, 1),
+            );
+            let ship2 = new battleship.Ship(
+                new battleship.Coordinate(0, 1),
+                new battleship.Coordinate(1, 1),
+            );
+            assert(ship1.collides(ship2));
+        });
+    });
+
+    describe('#hit()', () => {
+        it('does not hit with a bad shot', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 0);
             let ship = new battleship.Ship(start, end);
             let shot = new battleship.Shot(0, 1);
             assert(!ship.hit(shot));
         });
-        it('should hit a ship with a good shot', () => {
+        it('does hit with a good shot', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 0);
             let ship = new battleship.Ship(start, end);
@@ -21,20 +46,20 @@ describe('Ship', () => {
         });
     });
 
-    describe('size', () => {
-        it('should calculate size one correctly', () => {
+    describe('#size', () => {
+        it('calculates size one correctly', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 0);
             let ship = new battleship.Ship(start, end);
             assert.equal(ship.size, 1);
         });
-        it('should calculate width one correctly', () => {
+        it('calculates width one correctly', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1);
             let ship = new battleship.Ship(start, end);
             assert.equal(ship.size, 2);
         });
-        it('should calculate width two correctly', () => {
+        it('calculates width two correctly', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(1, 1);
             let ship = new battleship.Ship(start, end);
@@ -42,14 +67,14 @@ describe('Ship', () => {
         });
     });
 
-    describe('sunk', () => {
-        it('should not sink a ship with no hits', () => {
+    describe('#sunk', () => {
+        it('does not sink a ship with no hits', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1);
             let ship = new battleship.Ship(start, end);
             assert(!ship.sunk);
         });
-        it('should not sink a ship with some hits', () => {
+        it('does not sink a ship with some hits', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1);
             let ship = new battleship.Ship(start, end);
@@ -57,7 +82,7 @@ describe('Ship', () => {
             ship.hit(shot);
             assert(!ship.sunk);
         });
-        it('should sink a ship with all hits', () => {
+        it('does sink a ship with all hits', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1);
             let ship = new battleship.Ship(start, end);
@@ -69,32 +94,32 @@ describe('Ship', () => {
         });
     });
 
-    describe('valid', () => {
-        it('should validate a valid ship', () => {
+    describe('#valid', () => {
+        it('validates a valid ship', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1);
             let ship = new battleship.Ship(start, end);
             assert(ship.valid);
         });
-        it('should invalidate a ship that is too wide', () => {
+        it('invalidates a ship that is too wide', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(1, 1);
             let ship = new battleship.Ship(start, end);
             assert(!ship.valid);
         });
-        it('should invalidate a ship that is not integral', () => {
+        it('invalidates a ship that is not integral', () => {
             let start = new battleship.Coordinate(0, 0);
             let end = new battleship.Coordinate(0, 1.5);
             let ship = new battleship.Ship(start, end);
             assert(!ship.valid);
         });
-        it('should invalidate a ship that is outside the board', () => {
+        it('invalidates a ship that is outside the board', () => {
             let start = new battleship.Coordinate(-1, 0);
             let end = new battleship.Coordinate(-1, 1);
             let ship = new battleship.Ship(start, end);
             assert(!ship.valid);
         });
-        it('should invalidate a ship that is not numeric', () => {
+        it('invalidates a ship that is not numeric', () => {
             let start = new battleship.Coordinate(null, null);
             let end = new battleship.Coordinate(null, null);
             let ship = new battleship.Ship(start, end);

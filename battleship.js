@@ -13,9 +13,62 @@ class Coordinate {
         this.y = y;
     }
 
+    get valid() {
+        // must be integral
+        if(this.x !== Math.floor(this.x) ||
+           this.y !== Math.floor(this.y)) {
+            return false;
+        }
+        // must be on board
+        if(this.x < 0 || this.x > 9 ||
+           this.y < 0 || this.y > 9) {
+            return false;
+        }
+        // i guess it's ok
+        return true
+    }
 }
 
 class Game {
+
+    static shipsSunk(ships) {
+        // return true if all ships sunk
+        return Object.values(ships).every(ship => ship.sunk);
+    }
+
+    static shipsValid(ships) {
+        try {
+            // check number of ships
+            if(Object.keys(ships).length !== Object.keys(SHIPS).length) {
+                return false;
+            }
+            // make sure ship sizes are correct
+            for(let i in Object.keys(SHIPS)) {
+                let key = Object.keys(SHIPS)[i];
+                if(SHIPS[key] !== ships[key].size) {
+                    return false;
+                }
+            }
+            // make sure ships are valid
+            if(!Object.values(ships).every(ship => ship.valid)) {
+                return false;
+            }
+            // make sure ships don't collide
+            for(let i = 0; i < Object.values(ships).length-1; i++) {
+                for(let j = i+1; j < Object.values(ships).length; j++) {
+                    if(Object.values(ships)[i].collides(Object.values(ships)[j])) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // throwing an error is not valid
+        catch(error) {
+            return false;
+        }
+        // i guess it's ok
+        return true;
+    }
 
     constructor(player1, player2) {
 
@@ -23,7 +76,7 @@ class Game {
         this.currentPlayer = player1;
         this.currentPlayer.ships = player1.vm.run('player.ships');
         this.currentPlayer.state = player1.vm.run('state = new battleship.State()');
-        if(!this.shipsValid(this.currentPlayer.ships)) {
+        if(!Game.shipsValid(this.currentPlayer.ships)) {
             this.currentPlayer.ships = {};
         }
         
@@ -31,21 +84,25 @@ class Game {
         this.nextPlayer = player2;
         this.nextPlayer.ships = player2.vm.run('player.ships');
         this.nextPlayer.state = player2.vm.run('state = new battleship.State()');
-        if(!this.shipsValid(this.nextPlayer.ships)) {
+        if(!Game.shipsValid(this.nextPlayer.ships)) {
             this.nextPlayer.ships = {};
         }
     }
 
     play() {
+        // play until someone wins
         while(!this.gameover) {
             try {
+                // get the current players shot
                 let shot = this.currentPlayer.vm.run('player.shoot(state)');
                 this.shoot(shot);
             }
+            // throwing an exception on your turn is a disqualification
             catch(error) {
                 console.log(error);
                 this.currentPlayer.ships = {};
             }
+            // swap players
             [this.currentPlayer, this.nextPlayer] = [this.nextPlayer, this.currentPlayer];
             [this.currentPlayerShips, this.nextPlayerShips] = [this.nextPlayerShips, this.currentPlayerShips];
             [this.currentPlayerState, this.nextPlayerState] = [this.nextPlayerState, this.currentPlayerState];
@@ -53,73 +110,37 @@ class Game {
     }
 
     shoot(shot) {
-        if(Object.values(this.nextPlayer.ships).some(ship => ship.checkShot(shot))) {
+        // hit
+        if(Object.values(this.nextPlayer.ships).some(ship => ship.hit(shot))) {
+            // update board state
             this.currentPlayer.state.board[shot.x][shot.y] = 'hit';
+            // update ship state
+            this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => {
+                return !this.nextPlayer.ships[shipName].sunk;
+            });
         }
+        // miss
         else {
+            // update board state
             this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
         }
     }
 
-    shipsSunk(ships) {
-        return Object.values(ships).every(ship => ship.sunk);
-    }
-
-    shipsValid(ships) {
-        try {
-            if(Object.keys(ships).length !== Object.keys(SHIPS).length) {
-                console.log('incorrect number of ships!');
-                return false;
-            }
-            for(let i in Object.keys(SHIPS)) {
-                let key = Object.keys(SHIPS)[i];
-                console.log('key: '+ key);
-                if(SHIPS[key] !== ships[key].size) {
-                    console.log('invalid ship size!');
-                    return false;
-                }
-            }
-            if(!Object.values(ships).every(ship => ship.valid)) {
-                console.log('invalid ship found!');
-                return false;
-            }
-            for(let i = 0; i < Object.values(ships).length-1; i++) {
-                for(let j = i+1; j < Object.values(ships).length; j++) {
-                    if(this.shipsCollide(Object.values(ships)[i], Object.values(ships)[j])) {
-                        console.log('ships collide!');
-                        return false;
-                    }
-                }
-            }
-        }
-        catch(error) {
-            console.log(error);
-            return false;
-        }
-        return true;
-    }
-
-    shipsCollide(ship1, ship2) {
-        if(ship1.start.x > ship2.end.x || ship2.start.x > ship1.end.x) {
-            return false;
-        }
-        if(ship1.start.y > ship2.end.y || ship2.start.y > ship1.end.y) {
-            return false;
-        }
-        return true;
-    }
-
     get gameover() {
-        return this.shipsSunk(this.currentPlayer.ships) || this.shipsSunk(this.nextPlayer.ships);
+        // check if either player has all ships sunk
+        return Game.shipsSunk(this.currentPlayer.ships) || Game.shipsSunk(this.nextPlayer.ships);
     }
 
     get winner() {
-        if(!this.shipsSunk(this.currentPlayer.ships) && this.shipsSunk(this.nextPlayer.ships)) {
+        this.play();
+        // opponent ships must be sunk and your ships must not be sunk
+        if(!Game.shipsSunk(this.currentPlayer.ships) && Game.shipsSunk(this.nextPlayer.ships)) {
             return this.currentPlayer;
         }
-        if(!this.shipsSunk(this.nextPlayer.ships) && this.shipsSunk(this.currentPlayer.ships)) {
+        if(!Game.shipsSunk(this.nextPlayer.ships) && Game.shipsSunk(this.currentPlayer.ships)) {
             return this.nextPlayer;
         }
+        // no winnder
         return null;
     }
 
@@ -138,9 +159,24 @@ class Ship {
         if(start.y > end.y) {
             [start.y, end.y] = [end.y, start.y];
         }
+        // remember start and end points
         this.start = start;
         this.end = end;
+        // initialise hit counter
         this.hits = [];
+    }
+
+    collides(ship) {
+        // ships too far on x
+        if(this.start.x > ship.end.x || ship.start.x > this.end.x) {
+            return false;
+        }
+        // ships too far on y
+        if(this.start.y > ship.end.y || ship.start.y > this.end.y) {
+            return false;
+        }
+        // ships collide
+        return true;
     }
 
     // check if a shot hits or not
@@ -171,20 +207,12 @@ class Ship {
     get sunk() {
         return this.hits.length >= this.size;
     }
+
+    // valid ship tests
     get valid() {
         try{
-            // must be integral
-            if(this.start.x !== Math.floor(this.start.x) ||
-               this.start.y !== Math.floor(this.start.y) ||
-               this.end.x !== Math.floor(this.end.x) ||
-               this.end.y !== Math.floor(this.end.y)) {
-                return false;
-            }
-            // must be on board
-            if(this.start.x < 0 || this.start.x > 9 ||
-               this.start.y < 0 || this.start.y > 9 ||
-               this.end.x < 0 || this.end.x > 9 ||
-               this.end.y < 0 || this.end.y > 9) {
+            // must have valid coordinates
+            if(!this.start.valid || !this.end.valid) {
                 return false;
             }
             // must not be too wide
@@ -192,11 +220,12 @@ class Ship {
                 return false;
             }
         }
+        // throwing an error is invalid
         catch(error) {
             console.log(error);
             return false;
         }
-        // i guess it's fine
+        // i guess it's ok
         return true;
     }
 
@@ -205,13 +234,17 @@ class Ship {
 class State {
 
     constructor() {
+        // keep track of the board state
         this.board = [];
+        // initialise the board state
         for(let x = 0; x < 10; x++) {
             this.board[x] = [];
             for(let y = 0; y < 10; y++) {
+                // all squares are ocean at the start
                 this.board[x][y] = 'ocean';
             }
         }
+        // keep track of which ships are in play
         this.ships = Object.keys(SHIPS);
     }
 

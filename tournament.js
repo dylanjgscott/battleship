@@ -7,33 +7,37 @@ const PLAYER_DIR = './players/';
 
 class Tournament {
 
+    static loadPlayer(filename) {
+        try {
+            let data = fs.readFileSync(filename).toString();
+            let battleship = require('./battleship');
+            let vm = new vm2.VM({
+                    sandbox: {
+                        battleship: battleship,
+                        player: null,
+                        state: null,
+                    },
+                    timeout: 1000,
+            });
+            vm.run(data);
+            vm.run('let player = new Player()');
+            let name = vm.run('player.name');
+            let playerContainer = {
+                vm: vm,
+                name: name,
+                score: 0,
+            }
+            return playerContainer;
+        }
+        catch(error){
+            console.log(error);
+            return null;
+        }
+    }
+
     constructor() {
-        this.players = fs.readdirSync(PLAYER_DIR).map(file => {
-            try {
-                let data = fs.readFileSync(PLAYER_DIR + file).toString();
-                let battleship = require('./battleship');
-                let vm = new vm2.VM({
-                        sandbox: {
-                            battleship: battleship,
-                            player: null,
-                            state: null,
-                        },
-                        timeout: 1000,
-                });
-                vm.run(data);
-                vm.run('let player = new Player()');
-                let name = vm.run('player.name');
-                let playerContainer = {
-                    vm: vm,
-                    name: name,
-                    score: 0,
-                }
-                return playerContainer;
-            }
-            catch(error){
-                console.log(error);
-                return null;
-            }
+        this.players = fs.readdirSync(PLAYER_DIR).map(filename => {
+            return Tournament.loadPlayer(PLAYER_DIR + filename);
         });
     }
 
@@ -45,7 +49,6 @@ class Tournament {
                         player1.vm.run('player.opponent = "' + player2.name + '"');
                         player2.vm.run('player.opponent = "' + player1.name + '"');
                         let game = new battleship.Game(player1, player2);
-                        game.play();
                         if(game.winner) {
                             if(game.winner == player1) {
                                 player1.score++;
