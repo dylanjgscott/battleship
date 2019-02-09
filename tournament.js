@@ -3,13 +3,11 @@ const vm2 = require('vm2');
 
 const battleship = require('./battleship');
 
-const PLAYER_DIR = './players/';
-
 class Tournament {
 
-    static loadPlayer(filename) {
+    static loadPlayer(directory, filename) {
         try {
-            let data = fs.readFileSync(filename).toString();
+            let data = fs.readFileSync(directory + filename).toString();
             let battleship = require('./battleship');
             let vm = new vm2.VM({
                     sandbox: {
@@ -23,9 +21,10 @@ class Tournament {
             vm.run('let player = new Player()');
             let name = vm.run('player.name');
             let playerContainer = {
-                vm: vm,
+                filename: filename,
                 name: name,
                 score: 0,
+                vm: vm,
             }
             return playerContainer;
         }
@@ -34,13 +33,13 @@ class Tournament {
         }
     }
 
-    constructor() {
-        this.players = fs.readdirSync(PLAYER_DIR).map(filename => {
-            return Tournament.loadPlayer(PLAYER_DIR + filename);
+    constructor(directory) {
+        this.players = fs.readdirSync(directory).map(filename => {
+            return Tournament.loadPlayer(directory, filename);
         });
     }
 
-    scoreboard() {
+    results() {
         this.players.forEach(player1 => {
             this.players.forEach(player2 => {
                 if(player1 && player2 && player1 != player2) {
@@ -65,5 +64,4 @@ class Tournament {
 
 }
 
-exports.PLAYER_DIR = PLAYER_DIR;
 exports.Tournament = Tournament;

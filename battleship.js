@@ -72,33 +72,35 @@ class Game {
 
     constructor(player1, player2) {
         // Prepare player 1
-        this.currentPlayer = {};
+        this.player1 = {};
         try {
-            this.currentPlayer.player = player1;
-            this.currentPlayer.ships = player1.vm.run('player.ships');
-            this.currentPlayer.state = player1.vm.run('state = new battleship.State()');
-            this.currentPlayer.vm = player1.vm;
-            if(!Game.shipsValid(this.currentPlayer.ships)) {
+            this.player1.player = player1;
+            this.player1.ships = player1.vm.run('player.ships');
+            this.player1.state = player1.vm.run('state = new battleship.State()');
+            this.player1.vm = player1.vm;
+            if(!Game.shipsValid(this.player1.ships)) {
                 throw 'invalid ships';
             }
         }
         catch(error) {
-            this.currentPlayer.ships = {};
+            this.player1.ships = {};
         }
         // Prepare player 2
-        this.nextPlayer = {};
+        this.player2 = {};
         try {
-            this.nextPlayer.player = player2;
-            this.nextPlayer.ships = player2.vm.run('player.ships');
-            this.nextPlayer.state = player2.vm.run('state = new battleship.State()');
-            this.nextPlayer.vm = player2.vm;
-            if(!Game.shipsValid(this.nextPlayer.ships)) {
+            this.player2.player = player2;
+            this.player2.ships = player2.vm.run('player.ships');
+            this.player2.state = player2.vm.run('state = new battleship.State()');
+            this.player2.vm = player2.vm;
+            if(!Game.shipsValid(this.player2.ships)) {
                 throw 'invalid ships';
             }
         }
         catch(error) {
-            this.nextPlayer.ships = {};
+            this.player2.ships = {};
         }
+        this.currentPlayer = this.player1;
+        this.nextPlayer = this.player2;
     }
 
     turn(shot) {
