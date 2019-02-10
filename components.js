@@ -5,7 +5,7 @@ class Game extends React.Component {
         return (
             <div>
                 <h2>Winner: {this.props.winner.name}!</h2>
-                <h3>{this.props.game.player1.player.name}'s Board</h3>
+                <h3>{this.props.game.player1.player.name}'s Shots</h3>
                 <table>
                     {Array.from(Array(10).keys()).map(x => {
                         return (
@@ -21,7 +21,7 @@ class Game extends React.Component {
                         );
                     })}
                 </table>
-                <h3>{this.props.game.player2.player.name}'s Board</h3>
+                <h3>{this.props.game.player2.player.name}'s Shots</h3>
                 <table>
                     {Array.from(Array(10).keys()).map(x => {
                         return (
