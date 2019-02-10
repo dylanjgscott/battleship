@@ -79,30 +79,6 @@ class PlayerSelector extends React.Component {
     }
 }
 
-class Scoreboard extends React.Component {
-    render() {
-        return (
-            <div>
-                <h2>Scoreboard</h2>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Score</th>
-                    </tr>
-                    {this.props.players.map(player => {
-                        return (
-                            <tr key={player.filename}>
-                                <td>{player.name}</td>
-                                <td>{player.score}</td>
-                            </tr>
-                        );
-                    })}
-                </table>
-            </div>
-        );
-    }
-}
-
 class Upload extends React.Component {
     render() {
         return (
@@ -121,5 +97,4 @@ class Upload extends React.Component {
 
 exports.Game = Game;
 exports.PlayerSelector = PlayerSelector;
-exports.Scoreboard = Scoreboard;
 exports.Upload = Upload;

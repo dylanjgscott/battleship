@@ -1,7 +1,6 @@
 const assert = require('assert');
 
 const battleship = require('../battleship');
-const tournament = require('../tournament');
 
 const PLAYER_DIR = 'test/players/';
 
@@ -83,8 +82,8 @@ describe('Game', () => {
 
     describe('#turn()', () => {
         beforeEach(() => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             this.game = new battleship.Game(player1, player2);
         });
         it('updates the board state on hit', () => {
@@ -138,69 +137,69 @@ describe('Game', () => {
 
     describe('#winner', () => {
         it('has the right winner with two valid players', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player1.name);
         });
         it('says valid wins with valid versus invalidships', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidships.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player1.name);
         });
         it('says valid wins with invalidships versus valid', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidships.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player2.name);
         });
         it('has no winner with invalidships versus invalidships', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidships.js');
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidships.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner, null);
         });
         it('says valid wins with valid versus invalidshots', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidshots.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player1.name);
         });
         it('says valid wins with invalidshots versus valid', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidshots.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player2.name);
         });
         it('has no winner with invalidshots versus invalidshots', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidshots.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
             player1.name = 'player1'
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidshots.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner, null);
         });
         it('says valid wins invalidfile versus valid', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'invalidfile.js');
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidfile.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player2.name);
         });
         it('says valid wins infiniteships versus valid', () => {
-            let player1 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'infiniteships.js');
-            let player2 = tournament.Tournament.loadPlayer(PLAYER_DIR, 'valid.js');
+            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'infiniteships.js');
+            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             player2.name = 'player2'
             let game = new battleship.Game(player1, player2);
             assert.equal(game.winner.name, player2.name);

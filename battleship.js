@@ -1,3 +1,6 @@
+const fs = require('fs');
+const vm2 = require('vm2');
+
 const SHIPS = {
     carrier: 5,
     battleship: 4,
@@ -30,6 +33,35 @@ class Coordinate {
 }
 
 class Game {
+
+    static loadPlayer(directory, filename) {
+        try {
+            let battleship = require('./battleship');
+            let vm = new vm2.VM({
+                    sandbox: {
+                        battleship: battleship,
+                        player: null,
+                        state: null,
+                    },
+                    timeout: 1000,
+            });
+            let data = fs.readFileSync(directory + filename).toString();
+            vm.run(data);
+            vm.run('player = new Player()');
+            let name = vm.run('player.name');
+            let player = {
+                filename: filename,
+                name: name,
+                score: 0,
+                vm: vm,
+            }
+            return player;
+        }
+        catch(error) {
+            console.log(error);
+            return null;
+        }
+    }
 
     static shipsSunk(ships) {
         // return true if all ships sunk
