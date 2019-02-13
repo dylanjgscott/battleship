@@ -1,4 +1,5 @@
 const React = require('react');
+const Fragment = React.Fragment;
 
 class Game extends React.Component {
     render() {
@@ -42,38 +43,34 @@ class Game extends React.Component {
     }
 }
 
+class PlayerOptions extends React.Component {
+    render() {
+        return this.props.players.map(player => (<option key={player.filename} value={player.filename}>{player.name}</option>));
+    }
+}
+
+class Selector extends React.Component {
+    render() {
+        const { name, label, players } = this.props;
+        return (
+            <Fragment>
+            <label htmlFor={name}>{label}</label>
+            <select name={name} id={name}>
+                <PlayerOptions players={players} />
+            </select>
+            </Fragment>
+        );
+    }
+}
+
 class PlayerSelector extends React.Component {
     render() {
         return (
             <form action="/versus" method="get">
                 <h2>Player Selector</h2>
-                <p>
-                    <label htmlFor="player1">Player 1</label>
-                </p>
-                <p>
-                    <select id="player1" name="player1">
-                        {this.props.players.map(player => {
-                            return (
-                                <option key={player.filename} value={player.filename}>{player.name}</option>
-                            );
-                        })}
-                    </select>
-                </p>
-                <p>
-                    <label htmlFor="player2">Player 2</label>
-                </p>
-                <p>
-                    <select id="player2" name="player2">
-                        {this.props.players.map(player => {
-                            return (
-                                <option key={player.filename} value={player.filename}>{player.name}</option>
-                            );
-                        })}
-                    </select>
-                </p>
-                <p>
-                    <input type="submit" />
-                </p>
+                <Selector label="Player 1" name="player1" players={this.props.players} />
+                <Selector label="Player 2" name="player2" players={this.props.players} />
+                <input type="submit" />
             </form>
         );
     }
@@ -84,12 +81,8 @@ class Upload extends React.Component {
         return (
             <form action="/upload" method="post" encType="multipart/form-data">
                 <h2>Upload Player</h2>
-                <p>
-                    <input name="js" type="file" />
-                </p>
-                <p>
-                    <input name="submit" type="submit" />
-                </p>
+                <input name="js" type="file" />
+                <input name="submit" type="submit" />
             </form>
         );
     }
