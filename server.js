@@ -12,14 +12,6 @@ const battleship = require('./battleship');
 const components = require('./components');
 
 const PLAYER_DIR = 'players/';
-const HEADER = '<html>' +
-               '<head>' +
-               '<title>Battleship</title>' +
-               '</head>' +
-               '<body>' +
-               '<h1><a href="/">Battleship</a></h1>'
-const FOOTER = '</body>' +
-               '</html>'
 
 const app = express();
 const upload = multer({dest: PLAYER_DIR});
@@ -28,14 +20,10 @@ app.use('/static', express.static('static'));
 
 app.get('/', (request, response) => {
     let players = fs.readdirSync(PLAYER_DIR).map(filename => battleship.Game.loadPlayer(PLAYER_DIR, filename));
-    let playerSelector = React.createElement(components.PlayerSelector, {players: players});
-    let upload = React.createElement(components.Upload);
-    response.send(
-        HEADER +
-        ReactDOMServer.renderToString(playerSelector) +
-        ReactDOMServer.renderToString(upload) +
-        FOOTER
-    );
+    let playerForm = React.createElement(components.PlayerForm, {players: players});
+    let uploadForm = React.createElement(components.UploadForm);
+    let page = React.createElement(components.Page, [], [playerForm, uploadForm]);
+    response.send(ReactDOMServer.renderToString(page));
 });
 
 app.post('/upload', upload.single('js'), (request, response, next) => {
@@ -48,11 +36,8 @@ app.get('/versus', upload.single('js'), (request, response, next) => {
     let game = new battleship.Game(player1, player2);
     let winner = game.winner;
     let results = React.createElement(components.Game, {game: game, winner: winner});
-    response.send(
-        HEADER +
-        ReactDOMServer.renderToString(results) +
-        FOOTER
-    );
+    let page = React.createElement(components.Page, [], [results]);
+    response.send(ReactDOMServer.renderToString(page));
 });
 
 app.listen(8000);
