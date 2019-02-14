@@ -20,9 +20,7 @@ app.use('/static', express.static('static'));
 
 app.get('/', (request, response) => {
     let players = fs.readdirSync(PLAYER_DIR).map(filename => battleship.Game.loadPlayer(PLAYER_DIR, filename));
-    let playerForm = React.createElement(components.PlayerForm, {key: 'playerForm', players: players});
-    let uploadForm = React.createElement(components.UploadForm, {key: 'uploadForm'});
-    let page = React.createElement(components.Page, [], [playerForm, uploadForm]);
+    let page = React.createElement(components.MainPage, {players: players});
     response.send(ReactDOMServer.renderToString(page));
 });
 
@@ -35,8 +33,7 @@ app.get('/versus', upload.single('js'), (request, response, next) => {
     let player2 = battleship.Game.loadPlayer(PLAYER_DIR, request.query.player2);
     let game = new battleship.Game(player1, player2);
     let winner = game.winner;
-    let results = React.createElement(components.Game, {key: 'results', game: game, winner: winner});
-    let page = React.createElement(components.Page, [], [results]);
+    let page = React.createElement(components.GamePage, {game: game, winner: winner});
     response.send(ReactDOMServer.renderToString(page));
 });
 

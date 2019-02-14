@@ -42,6 +42,27 @@ class Game extends React.Component {
     }
 }
 
+class GamePage extends React.Component {
+    render() {
+        return (
+            <Page>
+                <Game key="game" game={this.props.game} winner={this.props.winner} />
+            </Page>
+        );
+    }
+}
+
+class MainPage extends React.Component {
+    render() {
+        return (
+            <Page>
+                <PlayerForm key="playerForm" players={this.props.players} />
+                <UploadForm key="uploadForm" />
+            </Page>
+        );
+    }
+}
+
 class Page extends React.Component {
     render() {
         return (
@@ -105,7 +126,5 @@ class UploadForm extends React.Component { render() {
     }
 }
 
-exports.Game = Game;
-exports.Page = Page;
-exports.PlayerForm = PlayerForm;
-exports.UploadForm = UploadForm;
+exports.GamePage = GamePage;
+exports.MainPage = MainPage;
