@@ -8,6 +8,7 @@ const SHIPS = {
     submarine: 3,
     destroyer: 2,
 }
+exports.SHIPS = SHIPS;
 
 class Coordinate {
 
@@ -31,6 +32,7 @@ class Coordinate {
         return true
     }
 }
+exports.Coordinate = Coordinate;
 
 class Game {
 
@@ -58,7 +60,6 @@ class Game {
             return player;
         }
         catch(error) {
-            console.log(error);
             return null;
         }
     }
@@ -201,8 +202,29 @@ class Game {
     }
 
 }
+exports.Game = Game;
 
-class Shot extends Coordinate {}
+class Match {
+
+    constructor(player1, player2, count) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.games = [];
+        for(let i = 0; i < count; i++) {
+            let game = new Game(player1, player2);
+            this.games.push(game);
+            let winner = game.winner;
+            if(winner == player1) {
+                player1.score++;
+            }
+            if(winner == player2) {
+                player2.score++;
+            }
+        }
+    }
+
+}
+exports.Match = Match;
 
 class Ship {
 
@@ -285,6 +307,10 @@ class Ship {
     }
 
 }
+exports.Ship = Ship;
+
+class Shot extends Coordinate {}
+exports.Shot = Shot;
 
 class State {
 
@@ -305,10 +331,4 @@ class State {
     }
 
 }
-
-exports.SHIPS = SHIPS;
-exports.Coordinate = Coordinate;
-exports.Game = Game;
-exports.Ship = Ship;
-exports.Shot = Shot;
 exports.State = State;

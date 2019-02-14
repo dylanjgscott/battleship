@@ -28,12 +28,11 @@ app.post('/upload', upload.single('js'), (request, response, next) => {
     response.redirect('/');
 });
 
-app.get('/versus', upload.single('js'), (request, response, next) => {
+app.get('/match', upload.single('js'), (request, response, next) => {
     let player1 = battleship.Game.loadPlayer(PLAYER_DIR, request.query.player1);
     let player2 = battleship.Game.loadPlayer(PLAYER_DIR, request.query.player2);
-    let game = new battleship.Game(player1, player2);
-    let winner = game.winner;
-    let page = React.createElement(components.GamePage, {game: game, winner: winner});
+    let match = new battleship.Match(player1, player2, request.query.count);
+    let page = React.createElement(components.MatchPage, {match: match});
     response.send(ReactDOMServer.renderToString(page));
 });
 

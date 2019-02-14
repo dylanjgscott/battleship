@@ -40,21 +40,35 @@ class GameBoard extends React.Component {
     }
 }
 
-class GamePage extends React.Component {
+class Games extends React.Component {
+    render() {
+        return this.props.games.map((game, index) => {
+            return (
+                <p style={{clear: "both"}}>
+                    <h4>Game {index+1}</h4>
+                    <div style={{float: "left"}}>
+                        <h5>{game.player1.player.name}'s Shots</h5>
+                        <GameBoard player={game.player1} />
+                        <Log player={game.player1} />
+                    </div>
+                    <div style={{float: "left"}}>
+                        <h5>{game.player2.player.name}'s Shots</h5>
+                        <GameBoard player={game.player2} />
+                        <Log player={game.player2} />
+                    </div>
+                </p>
+            );
+        });
+    }
+}
+
+class MatchPage extends React.Component {
     render() {
         return (
             <Page>
-                <h2>Winner: {this.props.winner.name}!</h2>
-                <div style={{float: 'left'}}>
-                    <h3>{this.props.game.player1.player.name}'s Shots</h3>
-                    <GameBoard player={this.props.game.player1} />
-                    <Log player={this.props.game.player1} />
-                </div>
-                <div style={{float: 'left'}}>
-                    <h3>{this.props.game.player2.player.name}'s Shots</h3>
-                    <GameBoard player={this.props.game.player2} />
-                    <Log player={this.props.game.player2} />
-                </div>
+                <h2>{this.props.match.player1.name} versus {this.props.match.player2.name}</h2>
+                <h3>Score {this.props.match.player1.score} to {this.props.match.player2.score}</h3>
+                <Games games={this.props.match.games} />
             </Page>
         );
     }
@@ -80,7 +94,7 @@ class MainPage extends React.Component {
     render() {
         return (
             <Page>
-                <PlayerForm key="playerForm" players={this.props.players} />
+                <MatchForm key="matchForm" players={this.props.players} />
                 <UploadForm key="uploadForm" />
             </Page>
         );
@@ -122,14 +136,22 @@ class PlayerSelector extends React.Component {
     }
 }
 
-class PlayerForm extends React.Component {
+class MatchForm extends React.Component {
     render() {
         return (
             <Fragment>
                 <h2>Player Selector</h2>
-                <form action="/versus" method="get">
+                <form action="/match" method="get">
                     <PlayerSelector label="Player 1" name="player1" players={this.props.players} />
                     <PlayerSelector label="Player 2" name="player2" players={this.props.players} />
+                    <label htmlFor="count">Count</label>
+                    <select name="count" id="count">
+                        <option value="1">1</option>
+                        <option value="3">3</option>
+                        <option value="5">5</option>
+                        <option value="7">7</option>
+                        <option value="9">9</option>
+                    </select>
                     <input type="submit" />
                 </form>
             </Fragment>
@@ -150,5 +172,5 @@ class UploadForm extends React.Component { render() {
     }
 }
 
-exports.GamePage = GamePage;
+exports.MatchPage = MatchPage;
 exports.MainPage = MainPage;
