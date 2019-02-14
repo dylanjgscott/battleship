@@ -156,15 +156,15 @@ class Game {
                     }
                 });
                 // update ship state
-                this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => {
-                    return !this.nextPlayer.ships[shipName].sunk;
-                });
+                this.currentPlayer.state.ships = Object.keys(this.nextPlayer.ships).filter(shipName => !this.nextPlayer.ships[shipName].sunk);
             }
             // shot misses
             else {
                 // update board state
                 this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
             }
+            // update log
+            this.currentPlayer.state.log.push({shot: shot, state: this.currentPlayer.state.board[shot.x][shot.y]});
         }
         catch(error) {
             // disqualification
@@ -301,6 +301,7 @@ class State {
         }
         // keep track of which ships are in play
         this.ships = Object.keys(SHIPS);
+        this.log = [];
     }
 
 }

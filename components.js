@@ -11,8 +11,8 @@ class GameCells extends React.Component {
 
 class GameRows extends React.Component {
     render() {
-        return this.props.rows.map(row =>
-            <tr><GameCells cells={row} /></tr>
+        return this.props.rows.map((row, index) =>
+            <tr><td>{index}</td><GameCells cells={row} /></tr>
         );
     }
 }
@@ -20,24 +20,22 @@ class GameRows extends React.Component {
 class GameBoard extends React.Component {
     render() {
         return (
-            <Fragment>
-                <h3>{this.props.player.player.name}'s Shots</h3>
-                <table>
-                    <GameRows rows={this.props.player.state.board} />
-                </table>
-            </Fragment>
-        );
-    }
-}
-
-class Game extends React.Component {
-    render() {
-        return (
-            <Fragment>
-                <h2>Winner: {this.props.winner.name}!</h2>
-                <GameBoard player={this.props.game.player1} />
-                <GameBoard player={this.props.game.player2} />
-            </Fragment>
+            <table>
+                <tr>
+                    <td>x\y</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                </tr>
+                <GameRows rows={this.props.player.state.board} />
+            </table>
         );
     }
 }
@@ -46,9 +44,35 @@ class GamePage extends React.Component {
     render() {
         return (
             <Page>
-                <Game key="game" game={this.props.game} winner={this.props.winner} />
+                <h2>Winner: {this.props.winner.name}!</h2>
+                <div style={{float: 'left'}}>
+                    <h3>{this.props.game.player1.player.name}'s Shots</h3>
+                    <GameBoard player={this.props.game.player1} />
+                    <Log player={this.props.game.player1} />
+                </div>
+                <div style={{float: 'left'}}>
+                    <h3>{this.props.game.player2.player.name}'s Shots</h3>
+                    <GameBoard player={this.props.game.player2} />
+                    <Log player={this.props.game.player2} />
+                </div>
             </Page>
         );
+    }
+}
+
+class Log extends React.Component {
+    render() {
+        return (
+            <ol>
+                <LogEntries log={this.props.player.state.log} />
+            </ol>
+        );
+    }
+}
+
+class LogEntries extends React.Component {
+    render() {
+        return this.props.log.map(log => <li>({log.shot.x},{log.shot.y}) {log.state}</li>);
     }
 }
 

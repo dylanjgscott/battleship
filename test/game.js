@@ -86,6 +86,11 @@ describe('Game', () => {
             let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
             this.game = new battleship.Game(player1, player2);
         });
+        it('updates the log', () => {
+            let shot = new battleship.Shot(0, 0);
+            this.game.turn(shot);
+            assert.equal(this.game.currentPlayer.state.log[0].shot, shot);
+        });
         it('updates the board state on hit', () => {
             assert.equal(this.game.currentPlayer.state.board[0][0], 'ocean');
             this.game.turn(new battleship.Shot(0, 0));
