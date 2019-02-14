@@ -108,9 +108,10 @@ class Game {
         this.player1 = {};
         try {
             this.player1.player = player1;
+            this.player1.vm = player1.vm;
+            this.player1.vm.run('player.opponent = ' + JSON.stringify(player2.name));
             this.player1.ships = player1.vm.run('player.ships');
             this.player1.state = player1.vm.run('state = new battleship.State()');
-            this.player1.vm = player1.vm;
             if(!Game.shipsValid(this.player1.ships)) {
                 throw 'invalid ships';
             }
@@ -122,9 +123,10 @@ class Game {
         this.player2 = {};
         try {
             this.player2.player = player2;
+            this.player2.vm = player2.vm;
+            this.player2.vm.run('player.opponent = ' + JSON.stringify(player1.name));
             this.player2.ships = player2.vm.run('player.ships');
             this.player2.state = player2.vm.run('state = new battleship.State()');
-            this.player2.vm = player2.vm;
             if(!Game.shipsValid(this.player2.ships)) {
                 throw 'invalid ships';
             }
