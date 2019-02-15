@@ -17,6 +17,7 @@
         "mocha": "^5.2.0"
     },
     "scripts": {
-        "test": "mocha"
+        "test": "mocha",
+        "start": "node ./server.js"
     }
 }
