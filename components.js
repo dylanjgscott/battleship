@@ -1,66 +1,50 @@
 const React = require('react');
 const Fragment = React.Fragment;
 
-class GameCells extends React.Component {
-    render() {
-        return this.props.cells.map(cell =>
-            <td><img src={"/static/" + cell + '.png'} /></td>
-        );
-    }
-}
+const GameCells = ({ cells }) =>
+    cells.map(cell =>
+        <td><img src={"/static/" + cell + '.png'} /></td>
+    );
 
-class GameRows extends React.Component {
-    render() {
-        return this.props.rows.map((row, index) =>
-            <tr><td>{index}</td><GameCells cells={row} /></tr>
-        );
-    }
-}
+const GameRows = ({ rows }) =>
+    rows.map((row, index) =>
+        <tr><td>{index}</td><GameCells cells={row} /></tr>
+    );
 
-class GameBoard extends React.Component {
-    render() {
-        return (
-            <table>
-                <tr>
-                    <td>x\y</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                    <td>8</td>
-                    <td>9</td>
-                </tr>
-                <GameRows rows={this.props.player.state.board} />
-            </table>
-        );
-    }
-}
+const GameBoard = ({ player }) => <table>
+    <tr>
+        <td>x\y</td>
+        <td>0</td>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+        <td>9</td>
+    </tr>
+    <GameRows rows={player.state.board} />
+</table>
 
-class Games extends React.Component {
-    render() {
-        return this.props.games.map((game, index) => {
-            return (
-                <p style={{clear: "both"}}>
-                    <h4>Game {index+1}</h4>
-                    <div style={{float: "left"}}>
-                        <h5>{game.player1.player.name}'s Shots</h5>
-                        <GameBoard player={game.player1} />
-                        <Log player={game.player1} />
-                    </div>
-                    <div style={{float: "left"}}>
-                        <h5>{game.player2.player.name}'s Shots</h5>
-                        <GameBoard player={game.player2} />
-                        <Log player={game.player2} />
-                    </div>
-                </p>
-            );
-        });
-    }
-}
+const Games = ({ games }) =>
+    games.map((game, index) =>
+            <p style={{clear: "both"}}>
+                <h4>Game {index + 1}</h4>
+                <div style={{float: "left"}}>
+                    <h5>{game.player1.player.name}'s Shots</h5>
+                    <GameBoard player={game.player1}/>
+                    <Log player={game.player1}/>
+                </div>
+                <div style={{float: "left"}}>
+                    <h5>{game.player2.player.name}'s Shots</h5>
+                    <GameBoard player={game.player2}/>
+                    <Log player={game.player2}/>
+                </div>
+            </p>
+    );
+
 
 class MatchPage extends React.Component {
     render() {
@@ -106,6 +90,7 @@ class Page extends React.Component {
         return (
             <html>
             <head>
+                <link rel="icon" href={require('./sweetDolphinPic.bmp')} />
             <title>Battleship</title>
             </head>
             <body>
