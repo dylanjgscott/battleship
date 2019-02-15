@@ -90,7 +90,7 @@ class Page extends React.Component {
         return (
             <html>
             <head>
-                <link rel="icon" href={require('./sweetDolphinPic.bmp')} />
+                <link rel="icon" href={require('./SweetDolphinPic.bmp')} />
             <title>Battleship</title>
             </head>
             <body>
