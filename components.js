@@ -119,7 +119,8 @@ class Page extends React.Component {
 
 class PlayerOptions extends React.Component {
     render() {
-        return this.props.players.map(player => (<option key={player.filename} value={player.filename}>{player.name}</option>));
+        let players = this.props.players.filter(player => player != null);
+        return players.map(player => (<option key={player.filename} value={player.filename}>{player.name}</option>));
     }
 }
 
