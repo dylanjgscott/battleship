@@ -3,6 +3,20 @@ const vm2 = require('vm2');
 
 class Player {
 
+    static loadPlayers(directory) {
+        let filenames = fs.readdirSync(directory);
+        let players = filenames.map(filename => {
+            try {
+                return new Player(directory, filename);
+            }
+            catch(error) {
+                return null;
+            }
+        });
+        players = players.filter(player => player != null);
+        return players;
+    }
+
     constructor(directory, filename) {
         this.vm = new vm2.VM({
             sandbox: {

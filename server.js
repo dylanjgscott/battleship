@@ -22,9 +22,7 @@ const upload = multer({ dest: PLAYER_DIR });
 app.use('/static', express.static('static'));
 
 app.get('/', (request, response) => {
-    let players = fs
-        .readdirSync(PLAYER_DIR)
-        .map(filename => new player.Player(PLAYER_DIR, filename));
+    let players = player.Player.loadPlayers(PLAYER_DIR);
     let page = React.createElement(MainPage, { players: players });
     response.send(ReactDOMServer.renderToString(page));
 });

@@ -14,12 +14,17 @@ class Game {
 
     static initialisePlayer(player, opponent) {
         let p = {};
-        player.vm.protect(opponent.name, 'opponent');
-        player.vm.run('player.opponent = opponent');
         p.player = player;
-        p.ships = ship.Ship.loadShips(player.vm.run('player.ships'));
         p.state = Game.freshState();
-        player.vm.protect(p.state, 'state');
+        try {
+            player.vm.protect(opponent.name, 'opponent');
+            player.vm.run('player.opponent = opponent');
+            p.ships = ship.Ship.loadShips(player.vm.run('player.ships'));
+            player.vm.protect(p.state, 'state');
+        }
+        catch(error) {
+            p.ships = {};
+        }
         return p;
     }
 
@@ -65,14 +70,19 @@ class Game {
     get winner() {
         // play until someone wins
         while(true) {
-            // get the players shot
-            let shot = new coordinate.Coordinate(this.currentPlayer.player.vm.run('player.shoot(state)'));
-            // take a turn
-            this.turn(shot);
+            try {
+                // get the players shot
+                let shot = new coordinate.Coordinate(this.currentPlayer.player.vm.run('player.shoot(state)'));
+                // take a turn
+                this.turn(shot);
+            }
+            catch(error) {
+                return this.nextPlayer.player;
+            }
             // opponent ships sunk
-            if(Object.keys(ship.SHIPS).every(shipName => this.nextPlayer.ships[shipName].sunk)) {
+            if(Object.keys(this.nextPlayer.ships).every(shipName => this.nextPlayer.ships[shipName].sunk)) {
                 // player ships still afloat
-                if(!Object.keys(ship.SHIPS).every(shipName => this.currentPlayer.ships[shipName].sunk)) {
+                if(!Object.keys(this.currentPlayer.ships).every(shipName => this.currentPlayer.ships[shipName].sunk)) {
                     // winner winner chicken dinner
                     return this.currentPlayer.player;
                 }
