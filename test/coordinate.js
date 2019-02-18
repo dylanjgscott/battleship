@@ -1,26 +1,46 @@
 const assert = require('assert');
-
-const battleship = require('../battleship');
+const coordinate = require('../coordinate');
 
 describe('Coordinate', () => {
 
-    describe('#valid', () => {
-        it('validates a valid coordinate', () => {
-            let coordinate = new battleship.Coordinate(0, 0);
-            assert(coordinate.valid);
+    describe('#constructor()', () => {
+
+        it('works with valid properties', () => {
+            let x = 0;
+            let y = 0;
+            let c = new coordinate.Coordinate({ x: x, y: y });
+            assert.equal(c.x, x);
+            assert.equal(c.y, y);
         });
-        it('invalidates a non-numerical coordinate', () => {
-            let coordinate = new battleship.Coordinate('a', 0);
-            assert(!coordinate.valid);
+
+        it('fails on non-numeric properties', () => {
+            assert.throws(() => new coordinate.Coordinate({ x: 'a', y: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ x: 0, y: 'a' }));
         });
-        it('invalidates a non-integral coordinate', () => {
-            let coordinate = new battleship.Coordinate(0.5, 0);
-            assert(!coordinate.valid);
+
+        it('fails on non-integral properties', () => {
+            assert.throws(() => new coordinate.Coordinate({ x: 0.5, y: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ x: 0, y: 0.5 }));
         });
-        it('invalidates a coordinate outside the board', () => {
-            let coordinate = new battleship.Coordinate(10, 0);
-            assert(!coordinate.valid);
+
+        it('fails on missing properties', () => {
+            assert.throws(() => new coordinate.Coordinate({}));
+            assert.throws(() => new coordinate.Coordinate({ x: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ y: 0 }));
         });
+
+        it('fails on null properties', () => {
+            assert.throws(() => new coordinate.Coordinate({ x: null, y: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ x: 0, y: null }));
+        });
+
+        it('fails on coordinates outside the board', () => {
+            assert.throws(() => new coordinate.Coordinate({ x: 10, y: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ x: 0, y: 10 }));
+            assert.throws(() => new coordinate.Coordinate({ x: -1, y: 0 }));
+            assert.throws(() => new coordinate.Coordinate({ x: 0, y: -1 }));
+        });
+
     });
 
 });

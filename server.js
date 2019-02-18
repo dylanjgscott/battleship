@@ -5,12 +5,13 @@ require('babel-register')({
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const express = require('express');
-const multer = require('multer');
 const fs = require('fs');
+const multer = require('multer');
 
-const battleship = require('./battleship');
 const MainPage = require('./components/MainPage');
 const MatchPage = require('./components/MatchPage');
+const match = require('./match');
+const player = require('./player');
 
 const PLAYER_DIR = 'players/';
 const PORT = 8000;
@@ -23,7 +24,7 @@ app.use('/static', express.static('static'));
 app.get('/', (request, response) => {
     let players = fs
         .readdirSync(PLAYER_DIR)
-        .map(filename => battleship.Game.loadPlayer(PLAYER_DIR, filename));
+        .map(filename => new player.Player(PLAYER_DIR, filename));
     let page = React.createElement(MainPage, { players: players });
     response.send(ReactDOMServer.renderToString(page));
 });
@@ -33,10 +34,10 @@ app.post('/upload', upload.single('js'), (request, response, next) => {
 });
 
 app.get('/match', upload.single('js'), (request, response, next) => {
-    let player1 = battleship.Game.loadPlayer(PLAYER_DIR, request.query.player1);
-    let player2 = battleship.Game.loadPlayer(PLAYER_DIR, request.query.player2);
-    let match = new battleship.Match(player1, player2, request.query.count);
-    let page = React.createElement(MatchPage, { match: match });
+    let p1 = new player.Player(PLAYER_DIR, request.query.player1);
+    let p2 = new player.Player(PLAYER_DIR, request.query.player2);
+    let m = new match.Match(p1, p2, request.query.count);
+    let page = React.createElement(MatchPage, { match: m });
     response.send(ReactDOMServer.renderToString(page));
 });
 

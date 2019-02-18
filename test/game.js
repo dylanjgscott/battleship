@@ -1,214 +1,140 @@
 const assert = require('assert');
+const coordinate = require('../coordinate');
+const game = require('../game');
+const player = require('../player');
 
-const battleship = require('../battleship');
-
-const PLAYER_DIR = 'test/players/';
-
-describe('Game', () => {
-
-    describe('#shipsSunk()', () => {
-        beforeEach(() => {
-            this.ships = {
-                carrier: new battleship.Ship(new battleship.Coordinate(4, 0), new battleship.Coordinate(4, 4)),
-                battleship: new battleship.Ship(new battleship.Coordinate(3, 0), new battleship.Coordinate(3, 3)),
-                cruiser: new battleship.Ship(new battleship.Coordinate(1, 0), new battleship.Coordinate(1, 2)),
-                submarine: new battleship.Ship(new battleship.Coordinate(2, 0), new battleship.Coordinate(2, 2)),
-                destroyer: new battleship.Ship(new battleship.Coordinate(0, 0), new battleship.Coordinate(0, 1)),
-            };
-        });
-        it('works with no sunk ships', () => {
-            assert(!battleship.Game.shipsSunk(this.ships));
-        });
-        it('works with some sunk ships', () => {
-            this.ships.destroyer.hit(new battleship.Shot(0, 0));
-            this.ships.destroyer.hit(new battleship.Shot(0, 1));
-            assert(this.ships.destroyer.sunk);
-            assert(!battleship.Game.shipsSunk(this.ships));
-        });
-        it('works with all sunk ships', () => {
-            delete this.ships.carrier;
-            delete this.ships.battleship;
-            delete this.ships.cruiser;
-            this.ships.submarine.hit(new battleship.Shot(2, 0));
-            this.ships.submarine.hit(new battleship.Shot(2, 1));
-            this.ships.submarine.hit(new battleship.Shot(2, 2));
-            this.ships.destroyer.hit(new battleship.Shot(0, 0));
-            this.ships.destroyer.hit(new battleship.Shot(0, 1));
-            assert(this.ships.submarine.sunk);
-            assert(this.ships.destroyer.sunk);
-            assert(battleship.Game.shipsSunk(this.ships));
-        });
-    });
-
-    describe('#shipsValid()', () => {
-        beforeEach(() => {
-            this.ships = {
-                carrier: new battleship.Ship(new battleship.Coordinate(4, 0), new battleship.Coordinate(4, 4)),
-                battleship: new battleship.Ship(new battleship.Coordinate(3, 0), new battleship.Coordinate(3, 3)),
-                cruiser: new battleship.Ship(new battleship.Coordinate(1, 0), new battleship.Coordinate(1, 2)),
-                submarine: new battleship.Ship(new battleship.Coordinate(2, 0), new battleship.Coordinate(2, 2)),
-                destroyer: new battleship.Ship(new battleship.Coordinate(0, 0), new battleship.Coordinate(0, 1)),
-            };
-        });
-        it('validates valid ships', () => {
-            assert(battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates colliding ships', () => {
-            this.ships.destroyer = new battleship.Ship(new battleship.Coordinate(4, 0), new battleship.Coordinate(4, 1)),
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates missing ships', () => {
-            delete this.ships.battleship;
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates extra ships', () => {
-            this.ships.dreadnought = new battleship.Ship(new battleship.Coordinate(5, 0), new battleship.Coordinate(5, 1)),
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates wrong ship sizes', () => {
-            this.ships.destroyer = new battleship.Ship(new battleship.Coordinate(0, 0), new battleship.Coordinate(0, 0)),
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates invalid ships', () => {
-            this.ships.destroyer = new battleship.Ship(new battleship.Coordinate(9, 9), new battleship.Coordinate(9, 10)),
-            assert(!this.ships.destroyer.valid);
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-        it('invalidates non-ships', () => {
-            this.ships.destroyer = null;
-            assert(!battleship.Game.shipsValid(this.ships));
-        });
-    });
+describe('Player', () => {
 
     describe('#turn()', () => {
+
         beforeEach(() => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            this.game = new battleship.Game(player1, player2);
+            this.player1 = new player.Player('test/players/', 'valid.js');
+            this.player2 = new player.Player('test/players/', 'valid.js');
+            this.game = new game.Game(this.player1, this.player2);
         });
-        it('updates the log', () => {
-            let shot = new battleship.Shot(0, 0);
-            this.game.turn(shot);
-            assert.equal(this.game.currentPlayer.state.log[0].shot, shot);
+
+        it('updates the board on miss', () => {
+            assert.equal(this.game.player1.state.board[9][9], 'ocean');
+            this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+            assert.equal(this.game.player1.state.board[9][9], 'miss');
+            assert.equal(this.game.player1.state.board[0][0], 'ocean');
+            assert.equal(this.game.player1.state.board[0][9], 'ocean');
+            assert.equal(this.game.player1.state.board[9][0], 'ocean');
         });
-        it('updates the board state on hit', () => {
-            assert.equal(this.game.currentPlayer.state.board[0][0], 'ocean');
-            this.game.turn(new battleship.Shot(0, 0));
-            assert.equal(this.game.currentPlayer.state.board[0][0], 'hit');
+
+        it('updates the board on hit', () => {
+            assert.equal(this.game.player1.state.board[0][0], 'ocean');
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            assert.equal(this.game.player1.state.board[0][0], 'hit');
+            assert.equal(this.game.player1.state.board[0][1], 'ocean');
+            assert.equal(this.game.player1.state.board[1][0], 'ocean');
+            assert.equal(this.game.player1.state.board[1][1], 'ocean');
         });
-        it('updates the boards state on miss', () => {
-            assert.equal(this.game.currentPlayer.state.board[9][9], 'ocean');
-            this.game.turn(new battleship.Shot(9, 9));
-            assert.equal(this.game.currentPlayer.state.board[9][9], 'miss');
-        });
-        it('updates the ship on hit', () => {
-            assert.equal(this.game.nextPlayer.ships.destroyer.hits.length, 0);
-            this.game.turn(new battleship.Shot(0, 0));
-            assert.equal(this.game.nextPlayer.ships.destroyer.hits.length, 1);
-        });
-        it('updates the ships on sink', () => {
-            assert(this.game.currentPlayer.state.ships.includes('destroyer'));
-            this.game.turn(new battleship.Shot(0, 0));
-            this.game.turn(new battleship.Shot(0, 1));
-            assert(!this.game.currentPlayer.state.ships.includes('destroyer'));
-        });
+
         it('updates the board on sink', () => {
-            assert.equal(this.game.currentPlayer.state.board[0][0], 'ocean');
-            assert.equal(this.game.currentPlayer.state.board[0][1], 'ocean');
-            this.game.turn(new battleship.Shot(0, 0));
-            this.game.turn(new battleship.Shot(0, 1));
-            assert.equal(this.game.currentPlayer.state.board[0][0], 'sunk');
-            assert.equal(this.game.currentPlayer.state.board[0][1], 'sunk');
+            assert.equal(this.game.player1.state.board[0][0], 'ocean');
+            assert.equal(this.game.player1.state.board[0][1], 'ocean');
+            assert.equal(this.game.player1.state.board[0][2], 'ocean');
+            assert.equal(this.game.player1.state.board[0][3], 'ocean');
+            assert.equal(this.game.player1.state.board[0][4], 'ocean');
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            assert(this.game.player2.ships.carrier.sunk);
+            assert.equal(this.game.player1.state.board[0][0], 'sunk');
+            assert.equal(this.game.player1.state.board[0][1], 'sunk');
+            assert.equal(this.game.player1.state.board[0][2], 'sunk');
+            assert.equal(this.game.player1.state.board[0][3], 'sunk');
+            assert.equal(this.game.player1.state.board[0][4], 'sunk');
         });
-        it('disqualifies on non-shot', () => {
-            this.game.turn(null);
-            assert.deepStrictEqual(this.game.currentPlayer.ships, {});
+
+        it('updates the log on miss', () => {
+            assert.equal(this.game.player1.state.log.length, 0);
+            let shot = new coordinate.Coordinate({ x: 9, y: 9 });
+            this.game.turn(shot);
+            assert.equal(this.game.player1.state.log[0].shot, shot);
+            assert.equal(this.game.player1.state.log[0].state, 'miss');
         });
-        it('disqualifies on invalid shot', () => {
-            this.game.turn(new battleship.Shot(10, 10));
-            assert.deepStrictEqual(this.game.currentPlayer.ships, {});
+
+        it('updates the log on hit', () => {
+            assert.equal(this.game.player1.state.log.length, 0);
+            let shot = new coordinate.Coordinate({ x: 0, y: 0 });
+            this.game.turn(shot);
+            assert.equal(this.game.player1.state.log[0].shot, shot);
+            assert.equal(this.game.player1.state.log[0].state, 'hit');
         });
-        it('disqualifies on shooting the same ocean square twice', () => {
-            this.game.turn(new battleship.Shot(9, 9));
-            this.game.turn(new battleship.Shot(9, 9));
-            assert.deepStrictEqual(this.game.currentPlayer.ships, {});
+
+        it('updates the log on sink', () => {
+            assert.equal(this.game.player1.state.log.length, 0);
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            assert.equal(this.game.player1.state.log.length, 5);
+            assert.equal(this.game.player1.state.log[4].state, 'sunk');
         });
-        it('disqualifies on shooting the same ship square twice', () => {
-            this.game.turn(new battleship.Shot(0, 0));
-            this.game.turn(new battleship.Shot(0, 0));
-            assert.deepStrictEqual(this.game.currentPlayer.ships, {});
+
+        it('updates the ships on sink', () => {
+            assert(this.game.player1.state.ships.includes('carrier'));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            assert(this.game.player2.ships.carrier.sunk);
+            assert(!this.game.player1.state.ships.includes('carrier'));
         });
+
+        it('sets the opponent name', () => {
+            assert.equal(this.game.player1.player.vm.run('player.opponent'), 'Valid');
+            assert.equal(this.game.player2.player.vm.run('player.opponent'), 'Valid');
+        });
+
+        it('fails when shooting a missed square', () => {
+            this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+            assert.equal(this.game.player1.state.board[9][9], 'miss');
+            assert.throws(() => {
+                this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+            });
+        });
+
+        it('fails when shooting a hit square', () => {
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            assert.equal(this.game.player1.state.board[0][0], 'hit');
+            assert.throws(() => {
+                this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            });
+        });
+
+        it('fails when shooting a sunk square', () => {
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            assert.equal(this.game.player1.state.board[0][0], 'sunk');
+            assert.throws(() => {
+                this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            });
+        });
+
     });
 
     describe('#winner', () => {
-        it('has the right winner with two valid players', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player1.name);
+
+        beforeEach(() => {
+            this.player1 = new player.Player('test/players/', 'valid.js');
+            this.player2 = new player.Player('test/players/', 'valid.js');
+            this.game = new game.Game(this.player1, this.player2);
         });
-        it('says valid wins with valid versus invalidships', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player1.name);
+
+        it('has the right winner', () => {
+            assert.equal(this.game.winner, this.player1);
         });
-        it('says valid wins with invalidships versus valid', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player2.name);
-        });
-        it('has no winner with invalidships versus invalidships', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidships.js');
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner, null);
-        });
-        it('says valid wins with valid versus invalidshots', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player1.name);
-        });
-        it('says valid wins with invalidshots versus valid', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player2.name);
-        });
-        it('has no winner with invalidshots versus invalidshots', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
-            player1.name = 'player1'
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidshots.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner, null);
-        });
-        it('says valid wins invalidfile versus valid', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'invalidfile.js');
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player2.name);
-        });
-        it('says valid wins infiniteships versus valid', () => {
-            let player1 = battleship.Game.loadPlayer(PLAYER_DIR, 'infiniteships.js');
-            let player2 = battleship.Game.loadPlayer(PLAYER_DIR, 'valid.js');
-            player2.name = 'player2'
-            let game = new battleship.Game(player1, player2);
-            assert.equal(game.winner.name, player2.name);
-        });
+
     });
 
 });

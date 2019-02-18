@@ -20,12 +20,12 @@ const Games = ({ games }) =>
             <h4 style={gameTitle}>Game {index + 1}</h4>
             <div style={gameLayout}>
                 <div>
-                    <h5>{game.player1.name}'s Shots</h5>
+                    <h5>{game.player1.player.name}'s Shots</h5>
                     <GameBoard player={game.player1} />
                     <Log player={game.player1} />
                 </div>
                 <div>
-                    <h5>{game.player2.name}'s Shots</h5>
+                    <h5>{game.player2.player.name}'s Shots</h5>
                     <GameBoard player={game.player2} />
                     <Log player={game.player2} />
                 </div>

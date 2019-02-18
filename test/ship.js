@@ -1,130 +1,202 @@
 const assert = require('assert');
-
-const battleship = require('../battleship');
+const coordinate = require('../coordinate');
+const ship = require('../ship');
 
 describe('Ship', () => {
 
+    describe('#loadShips()', () => {
+
+        it('loads all the ships', () => {
+            let ships = ship.Ship.loadShips({
+                carrier: { bow: { x: 0, y: 0 }, stern: { x: 0, y: 4 } },
+                battleship: { bow: { x: 1, y: 0 }, stern: { x: 1, y: 3 } },
+                cruiser: { bow: { x: 2, y: 0 }, stern: { x: 2, y: 2 } },
+                submarine: { bow: { x: 3, y: 0 }, stern: { x: 3, y: 2 }, },
+                destroyer: { bow: { x: 4, y: 0 }, stern: { x: 4, y: 1 } },
+            });
+            Object.keys(ship.SHIPS).forEach(shipName => assert.equal(ship.SHIPS[shipName], ships[shipName].size));
+        });
+
+        it('fails when the ships overlap', () => {
+            assert.throws(() => {
+                ship.Ship.loadShips({
+                    carrier: { bow: { x: 0, y: 0 }, stern: { x: 0, y: 4 } },
+                    battleship: { bow: { x: 1, y: 0 }, stern: { x: 1, y: 3 } },
+                    cruiser: { bow: { x: 2, y: 0 }, stern: { x: 2, y: 2 } },
+                    submarine: { bow: { x: 3, y: 0 }, stern: { x: 3, y: 2 }, },
+                    destroyer: { bow: { x: 3, y: 2 }, stern: { x: 3, y: 3 } },
+                });
+            });
+        });
+
+        it('fails when the ships are missing', () => {
+            assert.throws(() => {
+                ship.Ship.loadShips({});
+            });
+        });
+
+        it('fails when some ships are missing', () => {
+            assert.throws(() => {
+                ship.Ship.loadShips({
+                    carrier: { bow: { x: 0, y: 0 }, stern: { x: 0, y: 4 } },
+                    battleship: { bow: { x: 1, y: 0 }, stern: { x: 1, y: 3 } },
+                    cruiser: { bow: { x: 2, y: 0 }, stern: { x: 2, y: 2 } },
+                    submarine: { bow: { x: 3, y: 0 }, stern: { x: 3, y: 2 }, },
+                });
+            });
+        });
+
+        it('fails when some ships are null', () => {
+            assert.throws(() => {
+                ship.Ship.loadShips({
+                    carrier: { bow: { x: 0, y: 0 }, stern: { x: 0, y: 4 } },
+                    battleship: { bow: { x: 1, y: 0 }, stern: { x: 1, y: 3 } },
+                    cruiser: { bow: { x: 2, y: 0 }, stern: { x: 2, y: 2 } },
+                    submarine: { bow: { x: 3, y: 0 }, stern: { x: 3, y: 2 }, },
+                    destroyer: null,
+                });
+            });
+        });
+
+        it('fails when some ships are the wrong size', () => {
+            assert.throws(() => {
+                ship.Ship.loadShips({
+                    carrier: { bow: { x: 0, y: 0 }, stern: { x: 0, y: 4 } },
+                    battleship: { bow: { x: 1, y: 0 }, stern: { x: 1, y: 3 } },
+                    cruiser: { bow: { x: 2, y: 0 }, stern: { x: 2, y: 2 } },
+                    submarine: { bow: { x: 3, y: 0 }, stern: { x: 3, y: 2 }, },
+                    destroyer: { bow: { x: 4, y: 0 }, stern: { x: 4, y: 4 } },
+                });
+            });
+        });
+
+    });
+
+    describe('#constructor()', () => {
+
+        it('works with valid coordinates', () => {
+            let bow = { x: 0, y: 0 };
+            let stern = { x: 0, y: 1 };
+            let s = new ship.Ship({ bow: bow, stern: stern });
+            assert.equal(s.bow.x, bow.x);
+            assert.equal(s.bow.y, bow.y);
+            assert.equal(s.stern.x, stern.x);
+            assert.equal(s.stern.y, stern.y);
+        });
+
+        it('fails when a ship is too wide', () => {
+            let bow = { x: 0, y: 0 };
+            let stern = { x: 1, y: 1 };
+            assert.throws(() => { new ship.Ship({ bow: bow, stern: stern })});
+        });
+
+        it('fails when a ship is not integral', () => {
+            let bow = { x: 0.5, y: 0 };
+            let stern = { x: 0.5, y: 1 };
+            assert.throws(() => { new ship.Ship({ bow: bow, stern: stern })});
+        });
+
+        it('fails when a ship is outside the board', () => {
+            let bow = { x: -1, y: 0 };
+            let stern = { x: -1, y: 1 };
+            assert.throws(() => { new ship.Ship({ bow: bow, stern: stern })});
+        });
+
+        it('fails when a ship that is not numeric', () => {
+            let bow = { x: 'a', y: 0 };
+            let stern = { x: 'a', y: 1 };
+            assert.throws(() => { new ship.Ship({ bow: bow, stern: stern })});
+        });
+
+    });
+
     describe('#collides()', () => {
         it('does not collide ships which do not overlap', () => {
-            let ship1 = new battleship.Ship(
-                new battleship.Coordinate(0, 0),
-                new battleship.Coordinate(0, 1),
-            );
-            let ship2 = new battleship.Ship(
-                new battleship.Coordinate(1, 0),
-                new battleship.Coordinate(1, 1),
-            );
-            assert(!ship1.collides(ship2));
+            let s1 = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let s2 = new ship.Ship({ bow: { x: 1, y: 0 }, stern: { x: 1, y: 1 } });
+            assert(!s1.collides(s2));
+            assert(!s2.collides(s1));
         });
         it('collides ships which do overlap', () => {
-            let ship1 = new battleship.Ship(
-                new battleship.Coordinate(0, 0),
-                new battleship.Coordinate(0, 1),
-            );
-            let ship2 = new battleship.Ship(
-                new battleship.Coordinate(0, 1),
-                new battleship.Coordinate(1, 1),
-            );
-            assert(ship1.collides(ship2));
+            let s1 = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let s2 = new ship.Ship({ bow: { x: 0, y: 1 }, stern: { x: 0, y: 2 } });
+            assert(s1.collides(s2));
+            assert(s2.collides(s1));
         });
     });
 
     describe('#hit()', () => {
+
         it('does not hit with a bad shot', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 0);
-            let ship = new battleship.Ship(start, end);
-            let shot = new battleship.Shot(0, 1);
-            assert(!ship.hit(shot));
+            let s = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let shot = new coordinate.Coordinate({ x: 1, y: 1});
+            assert(!s.hit(shot));
         });
+
         it('does hit with a good shot', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 0);
-            let ship = new battleship.Ship(start, end);
-            let shot = new battleship.Shot(0, 0);
-            assert(ship.hit(shot));
+            let s = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let shot = new coordinate.Coordinate({ x: 0, y: 0});
+            assert(s.hit(shot));
         });
+
     });
 
     describe('#size', () => {
-        it('calculates size one correctly', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 0);
-            let ship = new battleship.Ship(start, end);
-            assert.equal(ship.size, 1);
+
+        it('calculates size 2 ships correctly', () => {
+            let bow = { x: 0, y: 0 };
+            let stern = { x: 0, y: 1 };
+            let s = new ship.Ship({ bow: bow, stern: stern });
+            assert.equal(s.size, 2);
         });
-        it('calculates width one correctly', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1);
-            let ship = new battleship.Ship(start, end);
-            assert.equal(ship.size, 2);
+
+        it('calculates size 5 ships correctly', () => {
+            let bow = { x: 0, y: 0 };
+            let stern = { x: 0, y: 4 };
+            let s = new ship.Ship({ bow: bow, stern: stern });
+            assert.equal(s.size, 5);
         });
-        it('calculates width two correctly', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(1, 1);
-            let ship = new battleship.Ship(start, end);
-            assert.equal(ship.size, 4);
+
+        it('calculates backwards ship sizes correctly', () => {
+            let bow = { x: 0, y: 4 };
+            let stern = { x: 0, y: 0 };
+            let s = new ship.Ship({ bow: bow, stern: stern });
+            assert.equal(s.size, 5);
         });
+
+        it('calculates vertial ships correctly', () => {
+            let bow = { x: 0, y: 0 };
+            let stern = { x: 4, y: 0 };
+            let s = new ship.Ship({ bow: bow, stern: stern });
+            assert.equal(s.size, 5);
+        });
+
     });
 
     describe('#sunk', () => {
+
         it('does not sink a ship with no hits', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1);
-            let ship = new battleship.Ship(start, end);
-            assert(!ship.sunk);
+            let s = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            assert(!s.sunk);
         });
+
         it('does not sink a ship with some hits', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1);
-            let ship = new battleship.Ship(start, end);
-            let shot = new battleship.Shot(0, 0);
-            ship.hit(shot);
-            assert(!ship.sunk);
+            let s = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let shot = new coordinate.Coordinate({ x: 0, y: 0 });
+            assert(s.hit(shot));
+            assert(!s.sunk);
         });
+
         it('does sink a ship with all hits', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1);
-            let ship = new battleship.Ship(start, end);
-            let shot1 = new battleship.Shot(0, 0);
-            let shot2 = new battleship.Shot(0, 1);
-            ship.hit(shot1);
-            ship.hit(shot2);
-            assert(ship.sunk);
+            let s = new ship.Ship({ bow: { x: 0, y: 0 }, stern: { x: 0, y: 1 } });
+            let shot1 = new coordinate.Coordinate({ x: 0, y: 0 });
+            assert(s.hit(shot1));
+            let shot2 = new coordinate.Coordinate({ x: 0, y: 1 });
+            assert(s.hit(shot2));
+            assert(s.sunk);
         });
+
     });
 
-    describe('#valid', () => {
-        it('validates a valid ship', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1);
-            let ship = new battleship.Ship(start, end);
-            assert(ship.valid);
-        });
-        it('invalidates a ship that is too wide', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(1, 1);
-            let ship = new battleship.Ship(start, end);
-            assert(!ship.valid);
-        });
-        it('invalidates a ship that is not integral', () => {
-            let start = new battleship.Coordinate(0, 0);
-            let end = new battleship.Coordinate(0, 1.5);
-            let ship = new battleship.Ship(start, end);
-            assert(!ship.valid);
-        });
-        it('invalidates a ship that is outside the board', () => {
-            let start = new battleship.Coordinate(-1, 0);
-            let end = new battleship.Coordinate(-1, 1);
-            let ship = new battleship.Ship(start, end);
-            assert(!ship.valid);
-        });
-        it('invalidates a ship that is not numeric', () => {
-            let start = new battleship.Coordinate(null, null);
-            let end = new battleship.Coordinate(null, null);
-            let ship = new battleship.Ship(start, end);
-            assert(!ship.valid);
-        });
-    });
 
 });
