@@ -14,6 +14,8 @@ class Ship {
 
     // Load ships from player
     static loadShips(playerShips) {
+        // Make sure the right number of ships are present
+        assert.equal(Object.keys(SHIPS).length, Object.keys(playerShips).length);
         // Load the ships
         let ships = {};
         Object.keys(SHIPS).forEach(shipName => ships[shipName] = new Ship(playerShips[shipName]));
