@@ -39,7 +39,7 @@ class Game {
     }
 
     turn(shot) {
-        // only allowed to shoot ocean square
+        // only allowed to shoot ocean cell
         assert.equal(this.currentPlayer.state.board[shot.x][shot.y], 'ocean');
         // shot hits
         if(Object.values(this.nextPlayer.ships).some(ship => ship.hit(shot))) {

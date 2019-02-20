@@ -33,7 +33,7 @@ class Ship {
     }
 
     constructor(options) {
-        // Ship must only be 1 square wide
+        // Ship must only be 1 cell wide
         assert(options.bow.x === options.stern.x || options.bow.y === options.stern.y);
         // Swap x, if needed
         if(options.bow.x > options.stern.x) {
@@ -83,7 +83,7 @@ class Ship {
         return true;
     }
 
-    // number of squares occupied by ship
+    // number of cells occupied by ship
     get size() {
         return (this.stern.x - this.bow.x + 1) * (this.stern.y - this.bow.y + 1);
     }

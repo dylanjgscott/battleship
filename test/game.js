@@ -93,7 +93,7 @@ describe('Player', () => {
             assert.equal(this.game.player2.player.vm.run('player.opponent'), 'Valid');
         });
 
-        it('fails when shooting a missed square', () => {
+        it('fails when shooting a missed cell', () => {
             this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
             assert.equal(this.game.player1.state.board[9][9], 'miss');
             assert.throws(() => {
@@ -101,7 +101,7 @@ describe('Player', () => {
             });
         });
 
-        it('fails when shooting a hit square', () => {
+        it('fails when shooting a hit cell', () => {
             this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
             assert.equal(this.game.player1.state.board[0][0], 'hit');
             assert.throws(() => {
@@ -109,7 +109,7 @@ describe('Player', () => {
             });
         });
 
-        it('fails when shooting a sunk square', () => {
+        it('fails when shooting a sunk cell', () => {
             this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
             this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
             this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
