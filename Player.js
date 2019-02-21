@@ -42,4 +42,4 @@ class Player {
     }
 
 }
-exports.Player = Player;
+module.exports = Player;

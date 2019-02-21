@@ -1,4 +1,10 @@
-DOCKER_IMAGE=719164424367.dkr.ecr.ap-southeast-2.amazonaws.com/presentation-layer-development:battleship
-all:
-	docker build -t ${DOCKER_IMAGE} .
-	docker push ${DOCKER_IMAGE}
+all: lambda.zip
+	aws lambda update-function-code --function-name battleship --zip-file fileb://lambda.zip
+build: node_modules
+	npm run build
+lambda.zip: build
+	zip -r lambda.zip node_modules components players Coordinate.js Game.js Match.js Player.js Ship.js lambda.js
+node_modules: package.json
+	npm install
+clean:
+	rm -rf lambda.zip node_modules

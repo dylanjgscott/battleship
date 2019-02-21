@@ -1,34 +1,35 @@
 const assert = require('assert');
-const coordinate = require('./coordinate');
-
-const SHIPS = {
-    carrier: 5,
-    battleship: 4,
-    cruiser: 3,
-    submarine: 3,
-    destroyer: 2,
-}
-exports.SHIPS = SHIPS;
+const Coordinate = require('./Coordinate');
 
 class Ship {
+
+    static get SHIPS() {
+        return {
+            carrier: 5,
+            battleship: 4,
+            cruiser: 3,
+            submarine: 3,
+            destroyer: 2,
+        };
+    }
 
     // Load ships from player
     static loadShips(playerShips) {
         // Make sure the right number of ships are present
-        assert.equal(Object.keys(SHIPS).length, Object.keys(playerShips).length);
+        assert.equal(Object.keys(Ship.SHIPS).length, Object.keys(playerShips).length);
         // Load the ships
         let ships = {};
-        Object.keys(SHIPS).forEach(shipName => ships[shipName] = new Ship(playerShips[shipName]));
+        Object.keys(Ship.SHIPS).forEach(shipName => ships[shipName] = new Ship(playerShips[shipName]));
         // Make sure none of the ships collide
-        Object.keys(SHIPS).forEach(shipName1 => {
-            Object.keys(SHIPS).forEach(shipName2 => {
+        Object.keys(Ship.SHIPS).forEach(shipName1 => {
+            Object.keys(Ship.SHIPS).forEach(shipName2 => {
                 if(shipName1 !== shipName2) {
                     assert(!ships[shipName1].collides(ships[shipName2]));
                 }
             });
         });
         // Make sure the ship sizes are correct
-        Object.keys(SHIPS).forEach(shipName => assert.equal(SHIPS[shipName], ships[shipName].size));
+        Object.keys(Ship.SHIPS).forEach(shipName => assert.equal(Ship.SHIPS[shipName], ships[shipName].size));
         return ships;
     }
 
@@ -44,8 +45,8 @@ class Ship {
             [options.bow.y, options.stern.y] = [options.stern.y, options.bow.y];
         }
         // Create coordinates for ship
-        this.bow = new coordinate.Coordinate(options.bow);
-        this.stern = new coordinate.Coordinate(options.stern);
+        this.bow = new Coordinate(options.bow);
+        this.stern = new Coordinate(options.stern);
         // Initialise hit counter
         this.hits = [];
     }
@@ -94,4 +95,4 @@ class Ship {
     }
 
 }
-exports.Ship = Ship;
+module.exports = Ship;

@@ -1,4 +1,4 @@
-const game = require('./game');
+const Game = require('./Game');
 
 class Match {
 
@@ -7,7 +7,7 @@ class Match {
         this.player2 = player2;
         this.games = [];
         for(let i = 0; i < count; i++) {
-            let g = new game.Game(player1, player2);
+            let g = new Game(player1, player2);
             this.games.push(g);
             let winner = g.winner;
             if(winner == player1) {
@@ -20,4 +20,4 @@ class Match {
     }
 
 }
-exports.Match = Match;
+module.exports = Match;

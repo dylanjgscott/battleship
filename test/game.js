@@ -1,21 +1,21 @@
 const assert = require('assert');
-const coordinate = require('../coordinate');
-const game = require('../game');
-const player = require('../player');
+const Coordinate = require('../Coordinate');
+const Game = require('../Game');
+const Player = require('../Player');
 
 describe('Player', () => {
 
     describe('#turn()', () => {
 
         beforeEach(() => {
-            this.player1 = new player.Player('test/players/', 'valid.js');
-            this.player2 = new player.Player('test/players/', 'valid.js');
-            this.game = new game.Game(this.player1, this.player2);
+            this.player1 = new Player('test/players/', 'valid.js');
+            this.player2 = new Player('test/players/', 'valid.js');
+            this.game = new Game(this.player1, this.player2);
         });
 
         it('updates the board on miss', () => {
             assert.equal(this.game.player1.state.board[9][9], 'ocean');
-            this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+            this.game.turn(new Coordinate({ x: 9, y: 9 }));
             assert.equal(this.game.player1.state.board[9][9], 'miss');
             assert.equal(this.game.player1.state.board[0][0], 'ocean');
             assert.equal(this.game.player1.state.board[0][9], 'ocean');
@@ -24,7 +24,7 @@ describe('Player', () => {
 
         it('updates the board on hit', () => {
             assert.equal(this.game.player1.state.board[0][0], 'ocean');
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
             assert.equal(this.game.player1.state.board[0][0], 'hit');
             assert.equal(this.game.player1.state.board[0][1], 'ocean');
             assert.equal(this.game.player1.state.board[1][0], 'ocean');
@@ -37,11 +37,11 @@ describe('Player', () => {
             assert.equal(this.game.player1.state.board[0][2], 'ocean');
             assert.equal(this.game.player1.state.board[0][3], 'ocean');
             assert.equal(this.game.player1.state.board[0][4], 'ocean');
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new Coordinate({ x: 0, y: 4 }));
             assert(this.game.player2.ships.carrier.sunk);
             assert.equal(this.game.player1.state.board[0][0], 'sunk');
             assert.equal(this.game.player1.state.board[0][1], 'sunk');
@@ -52,7 +52,7 @@ describe('Player', () => {
 
         it('updates the log on miss', () => {
             assert.equal(this.game.player1.state.log.length, 0);
-            let shot = new coordinate.Coordinate({ x: 9, y: 9 });
+            let shot = new Coordinate({ x: 9, y: 9 });
             this.game.turn(shot);
             assert.equal(this.game.player1.state.log[0].shot, shot);
             assert.equal(this.game.player1.state.log[0].state, 'miss');
@@ -60,7 +60,7 @@ describe('Player', () => {
 
         it('updates the log on hit', () => {
             assert.equal(this.game.player1.state.log.length, 0);
-            let shot = new coordinate.Coordinate({ x: 0, y: 0 });
+            let shot = new Coordinate({ x: 0, y: 0 });
             this.game.turn(shot);
             assert.equal(this.game.player1.state.log[0].shot, shot);
             assert.equal(this.game.player1.state.log[0].state, 'hit');
@@ -68,22 +68,22 @@ describe('Player', () => {
 
         it('updates the log on sink', () => {
             assert.equal(this.game.player1.state.log.length, 0);
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new Coordinate({ x: 0, y: 4 }));
             assert.equal(this.game.player1.state.log.length, 5);
             assert.equal(this.game.player1.state.log[4].state, 'sunk');
         });
 
         it('updates the ships on sink', () => {
             assert(this.game.player1.state.ships.includes('carrier'));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new Coordinate({ x: 0, y: 4 }));
             assert(this.game.player2.ships.carrier.sunk);
             assert(!this.game.player1.state.ships.includes('carrier'));
         });
@@ -94,30 +94,30 @@ describe('Player', () => {
         });
 
         it('fails when shooting a missed cell', () => {
-            this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+            this.game.turn(new Coordinate({ x: 9, y: 9 }));
             assert.equal(this.game.player1.state.board[9][9], 'miss');
             assert.throws(() => {
-                this.game.turn(new coordinate.Coordinate({ x: 9, y: 9 }));
+                this.game.turn(new Coordinate({ x: 9, y: 9 }));
             });
         });
 
         it('fails when shooting a hit cell', () => {
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
             assert.equal(this.game.player1.state.board[0][0], 'hit');
             assert.throws(() => {
-                this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+                this.game.turn(new Coordinate({ x: 0, y: 0 }));
             });
         });
 
         it('fails when shooting a sunk cell', () => {
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 1 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 2 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 3 }));
-            this.game.turn(new coordinate.Coordinate({ x: 0, y: 4 }));
+            this.game.turn(new Coordinate({ x: 0, y: 0 }));
+            this.game.turn(new Coordinate({ x: 0, y: 1 }));
+            this.game.turn(new Coordinate({ x: 0, y: 2 }));
+            this.game.turn(new Coordinate({ x: 0, y: 3 }));
+            this.game.turn(new Coordinate({ x: 0, y: 4 }));
             assert.equal(this.game.player1.state.board[0][0], 'sunk');
             assert.throws(() => {
-                this.game.turn(new coordinate.Coordinate({ x: 0, y: 0 }));
+                this.game.turn(new Coordinate({ x: 0, y: 0 }));
             });
         });
 
@@ -126,9 +126,9 @@ describe('Player', () => {
     describe('#winner', () => {
 
         beforeEach(() => {
-            this.player1 = new player.Player('test/players/', 'valid.js');
-            this.player2 = new player.Player('test/players/', 'valid.js');
-            this.game = new game.Game(this.player1, this.player2);
+            this.player1 = new Player('test/players/', 'valid.js');
+            this.player2 = new Player('test/players/', 'valid.js');
+            this.game = new Game(this.player1, this.player2);
         });
 
         it('has the right winner', () => {

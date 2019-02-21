@@ -1,6 +1,6 @@
 const assert = require('assert');
-const coordinate = require('./coordinate');
-const ship = require('./ship');
+const Coordinate = require('./Coordinate');
+const Ship = require('./Ship');
 
 class Game {
 
@@ -8,7 +8,7 @@ class Game {
         return {
             board: Array(10).fill().map(() => Array(10).fill('ocean')),
             log: [],
-            ships: Object.keys(ship.SHIPS),
+            ships: Object.keys(Ship.SHIPS),
         }
     }
 
@@ -19,7 +19,7 @@ class Game {
         try {
             player.vm.protect(opponent.name, 'opponent');
             player.vm.run('player.opponent = opponent');
-            p.ships = ship.Ship.loadShips(player.vm.run('player.ships'));
+            p.ships = Ship.loadShips(player.vm.run('player.ships'));
             player.vm.protect(p.state, 'state');
         }
         catch(error) {
@@ -72,7 +72,7 @@ class Game {
         while(true) {
             try {
                 // get the players shot
-                let shot = new coordinate.Coordinate(this.currentPlayer.player.vm.run('player.shoot(state)'));
+                let shot = new Coordinate(this.currentPlayer.player.vm.run('player.shoot(state)'));
                 // take a turn
                 this.turn(shot);
             }
@@ -95,4 +95,4 @@ class Game {
     }
 
 }
-exports.Game = Game;
+module.exports = Game;

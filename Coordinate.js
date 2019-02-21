@@ -15,4 +15,4 @@ class Coordinate {
     }
 
 }
-exports.Coordinate = Coordinate;
+module.exports = Coordinate;
