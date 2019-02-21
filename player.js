@@ -14,6 +14,15 @@ class Player {
             }
         });
         players = players.filter(player => player != null);
+        players.sort((player1, player2) => {
+            if(player1.name < player2.name) {
+                return -1;
+            }
+            if(player1.name > player2.name) {
+                return 1;
+            }
+            return 0;
+        });
         return players;
     }
 
