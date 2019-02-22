@@ -28,6 +28,23 @@ class Player {
         }
     }
 
+    static saveToDatabase(database, javascript) {
+        let player = new Player(form.javascript);
+        let dynamodb = new AWS.DynamoDB();
+        let params = {
+            Item: {
+                name: {
+                    S: player.name,
+                },
+                javascript: {
+                    S: javascript,
+                },
+            },
+            TableName: database,
+        };
+        await new Promise((resolve, reject) => dynamodb.putItem(params, (err, data) => err ? reject(err) : resolve(data)));
+    }
+
     static saveToFile(directory, javascript) {
         let player = new Player(javascript);
         fs.writeFileSync(directory + player.name + '.js', javascript);

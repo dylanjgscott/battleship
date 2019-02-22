@@ -8,14 +8,14 @@ const Player = require('./Player');
 const MainPage = require('./components/MainPage');
 const MatchPage = require('./components/MatchPage');
 
-const PLAYER_DIR = './players/';
+const PLAYER_DATABASE = 'battleship';
 
 exports.handler = async (event, context) => {
 
     let body;
 
     if(event.path === '/') {
-        let players = Player.loadFromDirectory(PLAYER_DIR);
+        let players = Player.loadFromDatabase(PLAYER_DATABASE);
         let page = React.createElement(MainPage, { players: players });
         return {
             statusCode: 200,
@@ -27,7 +27,7 @@ exports.handler = async (event, context) => {
     }
 
     if(event.path === '/match') {
-        let players = Player.loadFromDirectory(PLAYER_DIR);
+        let players = Player.loadFromDatabase(PLAYER_DATABASE);
         let player1;
         let player2;
         players.forEach(player => {
@@ -52,20 +52,7 @@ exports.handler = async (event, context) => {
     if(event.path === '/upload') {
         let post = Buffer.from(event.body, 'base64').toString();
         form = querystring.parse(post);
-        let player = new Player(form.javascript);
-        let dynamodb = new AWS.DynamoDB();
-        let params = {
-            Item: {
-                name: {
-                    S: player.name,
-                },
-                javascript: {
-                    S: form.javascript,
-                },
-            },
-            TableName: 'battleship',
-        };
-        await new Promise((resolve, reject) => dynamodb.putItem(params, (err, data) => err ? reject(err) : resolve(data)));
+        Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
         return {
             statusCode: 303,
             statusDescription: '303 See Other',
