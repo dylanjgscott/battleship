@@ -1,21 +1,42 @@
 const fs = require('fs');
+const AWS = require('aws-sdk');
 const vm2 = require('vm2');
 
 class Player {
 
+    static loadFromDatabase(database) {
+        let dynamodb = new AWS.DynamoDB();
+        let params = { TableName: database };
+        return new Promise((resolve, reject) => dynamodb.scan(params, (err, data) => err ? reject(err) : resolve(data.Items)));
+    }
+ 
     static loadFromDirectory(directory) {
-        let players = fs.readdirSync(directory).map(filename => Player.loadFromFile(directory + filename));
-        players = players.filter(player => player != null);
-        players.sort((player1, player2) => {
-            if(player1.name < player2.name) {
-                return -1;
-            }
-            if(player1.name > player2.name) {
-                return 1;
-            }
-            return 0;
+        return new Promise((resolve, reject) => {
+            fs.readdir(directory, (err, files) => {
+                if(err) {
+                    // Shit
+                    reject(err);
+                }
+                else {
+                    // Load players
+                    let players = files.map(filename => Player.loadFromFile(directory + filename));
+                    // Remove null players
+                    players = players.filter(player => player != null);
+                    // Sort players
+                    players = players.sort((player1, player2) => {
+                        if(player1.name > player2.name) {
+                            return 1;
+                        }
+                        if(player1.name < player2.name) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+                    // Resolve
+                    resolve(players);
+                }
+            });
         });
-        return players;
     }
 
     static loadFromFile(filename) {
@@ -28,7 +49,7 @@ class Player {
         }
     }
 
-    static saveToDatabase(database, javascript) {
+    static async saveToDatabase(database, javascript) {
         let player = new Player(form.javascript);
         let dynamodb = new AWS.DynamoDB();
         let params = {
@@ -47,7 +68,9 @@ class Player {
 
     static saveToFile(directory, javascript) {
         let player = new Player(javascript);
-        fs.writeFileSync(directory + player.name + '.js', javascript);
+        return new Promise((resolve, reject) => {
+            fs.writeFile(directory + player.name + '.js', javascript, err => err ? reject(err) : resolve());
+        });
     }
 
     constructor(javascript) {

@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const querystring = require('querystring');
