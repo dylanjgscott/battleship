@@ -4,6 +4,16 @@ const vm2 = require('vm2');
 
 class Player {
 
+    static sort(player1, player2) {
+        if(player1.name > player2.name) {
+            return 1;
+        }
+        if(player1.name < player2.name) {
+            return -1;
+        }
+        return 0;
+    }
+
     static loadFromDatabase(database) {
         let dynamodb = new AWS.DynamoDB();
         let params = { TableName: database };
@@ -13,9 +23,9 @@ class Player {
                     reject(err);
                 }
                 else { 
-                    let players = data.Items.map(item => {
-                        return new Player(item.javascript.S);
-                    });
+                    let players = data.Items.map(item => new Player(item.javascript.S));
+                    players = players.filter(player => player != null);
+                    players = players.sort(Player.sort);
                     resolve(players);
                 }
             });
@@ -35,15 +45,7 @@ class Player {
                     // Remove null players
                     players = players.filter(player => player != null);
                     // Sort players
-                    players = players.sort((player1, player2) => {
-                        if(player1.name > player2.name) {
-                            return 1;
-                        }
-                        if(player1.name < player2.name) {
-                            return -1;
-                        }
-                        return 0;
-                    });
+                    players = players.sort(Player.sort);
                     // Resolve
                     resolve(players);
                 }
