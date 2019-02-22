@@ -25,17 +25,8 @@ async function handler(event, context) {
     }
 
     if(event.path === '/match') {
-        let players = await Player.loadFromDatabase(PLAYER_DATABASE);
-        let player1;
-        let player2;
-        players.forEach(player => {
-            if(player.name === event.queryStringParameters.player1) {
-                player1 = player;
-            }
-            if(player.name === event.queryStringParameters.player2) {
-                player2 = player;
-            }
-        });
+        let player1 = await Player.loadFromDatabase(PLAYER_DATABASE, event.queryStringParameters.player1);
+        let player2 = await Player.loadFromDatabase(PLAYER_DATABASE, event.queryStringParameters.player2);
         let match = new Match(player1, player2, event.queryStringParameters.count);
         let page = React.createElement(MatchPage, { match: match });
         return {

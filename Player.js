@@ -14,22 +14,47 @@ class Player {
         return 0;
     }
 
-    static loadFromDatabase(database) {
-        let dynamodb = new AWS.DynamoDB();
-        let params = { TableName: database };
-        return new Promise((resolve, reject) => {
-            dynamodb.scan(params, (err, data) => {
-                if(err) {
-                    reject(err);
-                }
-                else { 
-                    let players = data.Items.map(item => new Player(item.javascript.S));
-                    players = players.filter(player => player != null);
-                    players = players.sort(Player.sort);
-                    resolve(players);
-                }
+    static loadFromDatabase(database, name) {
+        // Load one player
+        if(name) {
+            let dynamodb = new AWS.DynamoDB();
+            let params = {
+                Key: {
+                    name: {
+                        S: name,
+                    }
+                },
+                TableName: database,
+            };
+            return new Promise((resolve, reject) => {
+                dynamodb.getItem(params, (err, data) => {
+                    if(err) {
+                        reject(err);
+                    }
+                    else { 
+                        resolve(new Player(data.Item.javascript.S));
+                    }
+                });
             });
-        });
+        }
+        // Load all players
+        else {
+            let dynamodb = new AWS.DynamoDB();
+            let params = { TableName: database };
+            return new Promise((resolve, reject) => {
+                dynamodb.scan(params, (err, data) => {
+                    if(err) {
+                        reject(err);
+                    }
+                    else { 
+                        let players = data.Items.map(item => new Player(item.javascript.S));
+                        players = players.filter(player => player != null);
+                        players = players.sort(Player.sort);
+                        resolve(players);
+                    }
+                });
+            });
+        }
     }
 
     static async loadFromDirectory(directory) {
