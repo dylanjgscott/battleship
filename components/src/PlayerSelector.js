@@ -4,7 +4,7 @@ const Fragment = React.Fragment;
 class PlayerOptions extends React.Component {
     render() {
         return this.props.players.map(player => (
-            <option key={player.filename} value={player.filename}>
+            <option key={player.name} value={player.name}>
                 {player.name}
             </option>
         ));

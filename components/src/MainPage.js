@@ -8,12 +8,8 @@ class UploadForm extends React.Component {
         return (
             <Fragment>
                 <h2>Player Upload</h2>
-                <form
-                    action="/upload"
-                    method="post"
-                    encType="multipart/form-data"
-                >
-                    <input name="js" type="file" />
+                <form action="/upload" method="post">
+                    <textarea name="javascript"></textarea>
                     <input name="submit" type="submit" />
                 </form>
             </Fragment>

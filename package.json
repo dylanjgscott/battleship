@@ -5,21 +5,23 @@
     "author": "Dylan Scott",
     "license": "BSD-3-Clause",
     "dependencies": {
-        "react": "^16.8.2",
-        "react-dom": "^16.8.2",
+        "aws-sdk": "^2.408.0",
+        "react": "^16.8.3",
+        "react-dom": "^16.8.3",
         "vm2": "^3.6.10"
     },
     "devDependencies": {
         "@babel/cli": "^7.2.3",
         "@babel/core": "^7.3.3",
         "@babel/preset-react": "^7.0.0",
+        "body-parser": "^1.18.3",
         "express": "^4.16.4",
         "mocha": "^5.2.0",
-        "multer": "^1.4.1"
+        "nodemon": "^1.18.10"
     },
     "scripts": {
         "test": "mocha",
         "build": "babel --copy-files --out-dir components components/src",
-        "start": "node server.js"
+        "server": "nodemon server.js"
     }
 }

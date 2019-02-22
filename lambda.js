@@ -1,10 +1,12 @@
+const AWS = require('aws-sdk');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
+const querystring = require('querystring');
 
-const MainPage = require('./components/MainPage');
-const MatchPage = require('./components/MatchPage');
 const Match = require('./Match');
 const Player = require('./Player');
+const MainPage = require('./components/MainPage');
+const MatchPage = require('./components/MatchPage');
 
 const PLAYER_DIR = './players/';
 
@@ -24,6 +26,26 @@ exports.handler = async (event, context) => {
         let match = new Match(player1, player2, event.queryStringParameters.count);
         let page = React.createElement(MatchPage, { match: match });
         body = ReactDOMServer.renderToString(page);
+    }
+
+    if(event.path === '/upload') {
+        let post = Buffer.from(event.body, 'base64').toString();
+        form = querystring.parse(post);
+        let player = new Player(form.javascript);
+        let dynamodb = new AWS.DynamoDB();
+        let params = {
+            Item: {
+                name: {
+                    S: player.name,
+                },
+                javascript: {
+                    S: form.javascript,
+                },
+            },
+            TableName: 'battleship',
+        };
+        await new Promise((resolve, reject) => dynamodb.putItem(params, (err, data) => err ? reject(err) : resolve(data)));
+        body = 'ok';
     }
 
     return {

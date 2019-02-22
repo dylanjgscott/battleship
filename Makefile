@@ -7,4 +7,4 @@ lambda.zip: build
 node_modules: package.json
 	npm install
 clean:
-	rm -rf lambda.zip node_modules
+	rm lambda.zip

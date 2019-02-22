@@ -8,8 +8,8 @@ describe('Player', () => {
     describe('#turn()', () => {
 
         beforeEach(() => {
-            this.player1 = new Player('test/players/', 'valid.js');
-            this.player2 = new Player('test/players/', 'valid.js');
+            this.player1 = Player.loadFromFile('test/players/valid.js');
+            this.player2 = Player.loadFromFile('test/players/valid.js');
             this.game = new Game(this.player1, this.player2);
         });
 
@@ -126,8 +126,8 @@ describe('Player', () => {
     describe('#winner', () => {
 
         beforeEach(() => {
-            this.player1 = new Player('test/players/', 'valid.js');
-            this.player2 = new Player('test/players/', 'valid.js');
+            this.player1 = Player.loadFromFile('test/players/valid.js');
+            this.player2 = Player.loadFromFile('test/players/valid.js');
             this.game = new Game(this.player1, this.player2);
         });
 
