@@ -9,7 +9,7 @@ Yeah, it's ugly. Can you please help me make it look nice?
 
 ## Write Your Own Player
 
-See [players/example.js](players/example.js) for an example player you can get
+See [players/Example.js](players/Example.js) for an example player you can get
 started with.
 
 ## Running your own server
