@@ -3,7 +3,7 @@ all: lambda.zip
 build: node_modules
 	npm run build
 lambda.zip: build
-	zip -r lambda.zip node_modules components Coordinate.js Game.js Match.js Player.js Ship.js lambda.js
+	zip -r lambda.zip node_modules components static Coordinate.js Game.js Match.js Player.js Ship.js lambda.js
 node_modules: package.json
 	npm install
 clean:

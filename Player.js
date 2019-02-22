@@ -7,7 +7,19 @@ class Player {
     static loadFromDatabase(database) {
         let dynamodb = new AWS.DynamoDB();
         let params = { TableName: database };
-        return new Promise((resolve, reject) => dynamodb.scan(params, (err, data) => err ? reject(err) : resolve(data.Items)));
+        return new Promise((resolve, reject) => {
+            dynamodb.scan(params, (err, data) => {
+                if(err) {
+                    reject(err);
+                }
+                else { 
+                    let players = data.Items.map(item => {
+                        return new Player(item.javascript.S);
+                    });
+                    resolve(players);
+                }
+            });
+        });
     }
  
     static loadFromDirectory(directory) {
@@ -49,7 +61,7 @@ class Player {
         }
     }
 
-    static async saveToDatabase(database, javascript) {
+    static saveToDatabase(database, javascript) {
         let player = new Player(form.javascript);
         let dynamodb = new AWS.DynamoDB();
         let params = {
@@ -63,7 +75,7 @@ class Player {
             },
             TableName: database,
         };
-        await new Promise((resolve, reject) => dynamodb.putItem(params, (err, data) => err ? reject(err) : resolve(data)));
+        return new Promise((resolve, reject) => dynamodb.putItem(params, (err, data) => err ? reject(err) : resolve(data)));
     }
 
     static saveToFile(directory, javascript) {

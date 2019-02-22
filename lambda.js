@@ -1,5 +1,6 @@
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
+const fs = require('fs');
 const querystring = require('querystring');
 
 const Match = require('./Match');
@@ -9,12 +10,10 @@ const MatchPage = require('./components/MatchPage');
 
 const PLAYER_DATABASE = 'battleship';
 
-exports.handler = async (event, context) => {
-
-    let body;
+async function handler(event, context) {
 
     if(event.path === '/') {
-        let players = Player.loadFromDatabase(PLAYER_DATABASE);
+        let players = await Player.loadFromDatabase(PLAYER_DATABASE);
         let page = React.createElement(MainPage, { players: players });
         return {
             statusCode: 200,
@@ -26,7 +25,7 @@ exports.handler = async (event, context) => {
     }
 
     if(event.path === '/match') {
-        let players = Player.loadFromDatabase(PLAYER_DATABASE);
+        let players = await Player.loadFromDatabase(PLAYER_DATABASE);
         let player1;
         let player2;
         players.forEach(player => {
@@ -49,9 +48,9 @@ exports.handler = async (event, context) => {
     }
 
     if(event.path === '/upload') {
-        let post = Buffer.from(event.body, 'base64').toString();
+        let post = Buffer.from(event.body, 'base64').toString('utf-8');
         form = querystring.parse(post);
-        Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
+        await Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
         return {
             statusCode: 303,
             statusDescription: '303 See Other',
@@ -60,4 +59,15 @@ exports.handler = async (event, context) => {
         };
     }
 
+    if(event.path.startsWith('/static/')) {
+        return {
+            statusCode: 200,
+            statusDescription: '200 OK',
+            isBase64Encoded: true,
+            headers: { 'content-type': 'image/png' },
+            body: fs.readFileSync(event.path.substring(1)).toString('base64'),
+        };
+    }
+
 };
+exports.handler = handler;
