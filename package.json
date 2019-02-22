@@ -1,6 +1,6 @@
 {
     "name": "battleship",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Battleship tournament",
     "author": "Dylan Scott",
     "license": "BSD-3-Clause",
@@ -21,7 +21,7 @@
     },
     "scripts": {
         "test": "mocha",
-        "build": "babel --copy-files --out-dir components components/src",
-        "server": "nodemon server.js"
+        "build": "babel --copy-files --out-dir components src",
+        "start": "nodemon server.js"
     }
 }
