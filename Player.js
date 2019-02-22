@@ -31,10 +31,10 @@ class Player {
             });
         });
     }
- 
-    static loadFromDirectory(directory) {
+
+    static async loadFromDirectory(directory) {
         return new Promise((resolve, reject) => {
-            fs.readdir(directory, (err, files) => {
+            fs.readdir(directory, async (err, files) => {
                 if(err) {
                     // Shit
                     reject(err);
@@ -42,6 +42,7 @@ class Player {
                 else {
                     // Load players
                     let players = files.map(filename => Player.loadFromFile(directory + filename));
+                    players = await Promise.all(players);
                     // Remove null players
                     players = players.filter(player => player != null);
                     // Sort players
@@ -54,13 +55,16 @@ class Player {
     }
 
     static loadFromFile(filename) {
-        try {
-            return new Player(fs.readFileSync(filename, { encoding: 'utf-8' }));
-        }
-        catch(error) {
-            console.log(error);
-            return null;
-        }
+        return new Promise((resolve, reject) => {
+            fs.readFile(filename, { encoding: 'utf-8' }, (err, data) => {
+                if(err) {
+                    reject(err);
+                }
+                else {
+                    resolve(new Player(data));
+                }
+            });
+        });
     }
 
     static saveToDatabase(database, javascript) {

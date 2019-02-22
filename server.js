@@ -29,18 +29,8 @@ else {
         response.send(ReactDOMServer.renderToString(page));
     });
     app.get('/match', async (request, response) => {
-        let player1;
-        let player2;
-        let players = await Player.loadFromDirectory(PLAYER_DIR);
-        players.forEach(player => {
-            if(player.name === request.query.player1) {
-                player1 = player;
-            }
-            if(player.name === request.query.player2) {
-                player2 = player;
-            }
-        });
-        
+        let player1 = await Player.loadFromFile(PLAYER_DIR + request.query.player1 + '.js');
+        let player2 = await Player.loadFromFile(PLAYER_DIR + request.query.player2 + '.js');
         let match = new Match(player1, player2, request.query.count);
         let page = React.createElement(MatchPage, { match: match });
         response.send(ReactDOMServer.renderToString(page));
