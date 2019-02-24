@@ -39,6 +39,7 @@ Resources:
                   - iam:DeleteRole
                   - iam:DetachRolePolicy
                   - iam:GetRole
+                  - iam:PassRole
                   - lambda:CreateFunction
                   - lambda:DeleteFunction
                 Resource: '*'
