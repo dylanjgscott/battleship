@@ -8,7 +8,7 @@ const gameBoard = {
 const GameCells = ({ cells }) =>
     cells.map(cell => (
         <td>
-            <img src={'/static/' + cell + '.png'} />
+            <img src={'/static/' + cell} />
         </td>
     ));
 

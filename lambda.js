@@ -8,22 +8,47 @@ const Player = require('./Player');
 const MainPage = require('./components/MainPage');
 const MatchPage = require('./components/MatchPage');
 
-const PLAYER_DATABASE = 'battleship';
+const PLAYER_DATABASE = process.env.TABLE_NAME;
 
-async function handler(event, context) {
+function getStaticAsset(filename, callback) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filename, (err, data) => {
+            if(err) {
+                reject(err);
+            }
+            else {
+                callback(null, {
+                    body: data.toString('base64'),
+                    headers: { 'Content-Type': 'image/png' },
+                    isBase64Encoded: true,
+                    multiValueHeaders: {
+                        'Cache-Control': [ 'public', 'max-age=3600' ],
+                    },
+                    statusCode: 200,
+                });
+                resolve();
+            }
+        });
+    });
+}
 
-    console.log(event);
+async function handler(event, context, callback) {
+
+    console.log(JSON.stringify(event));
 
     if(event.path === '/') {
         let players = await Player.loadFromDatabase(PLAYER_DATABASE);
         let page = React.createElement(MainPage, { players: players });
-        return {
-            statusCode: 200,
-            statusDescription: '200 OK',
-            isBase64Encoded: false,
-            headers: { 'content-type': 'text/html' },
+        callback(null, {
             body: ReactDOMServer.renderToString(page),
-        };
+            headers: {
+                'Content-Type': 'text/html'
+            },
+            multiValueHeaders: {
+                'Cache-Control': [ 'public', 'max-age=0' ],
+            },
+            statusCode: 200,
+        });
     }
 
     if(event.path === '/match') {
@@ -31,35 +56,46 @@ async function handler(event, context) {
         let player2 = await Player.loadFromDatabase(PLAYER_DATABASE, event.queryStringParameters.player2);
         let match = new Match(player1, player2, event.queryStringParameters.count);
         let page = React.createElement(MatchPage, { match: match });
-        return {
-            statusCode: 200,
-            statusDescription: '200 OK',
-            isBase64Encoded: false,
-            headers: { 'content-type': 'text/html' },
+        callback(null, {
             body: ReactDOMServer.renderToString(page),
-        };
+            headers: { 'Content-Type': 'text/html' },
+            multiValueHeaders: {
+                'Cache-Control': [ 'public', 'max-age=0' ],
+            },
+            statusCode: 200,
+        });
     }
 
     if(event.path === '/upload') {
-        let post = Buffer.from(event.body, 'base64').toString('utf-8');
+        let post;
+        if(event.isBase64Encoded) {
+            post = Buffer.from(event.body, 'base64').toString('utf-8');
+        }
+        else {
+            post = event.body;
+        }
         form = querystring.parse(post);
         await Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
-        return {
-            statusCode: 303,
-            statusDescription: '303 See Other',
-            isBase64Encoded: false,
+        callback(null, {
             headers: { location: '/' },
-        };
+            statusCode: 303,
+        });
     }
 
-    if(event.path.startsWith('/static/')) {
-        return {
-            statusCode: 200,
-            statusDescription: '200 OK',
-            isBase64Encoded: true,
-            headers: { 'content-type': 'image/png' },
-            body: fs.readFileSync(event.path.substring(1)).toString('base64'),
-        };
+    if(event.path === '/static/ocean') {
+        await getStaticAsset('static/ocean.png', callback);
+    }
+
+    if(event.path === '/static/miss') {
+        await getStaticAsset('static/miss.png', callback);
+    }
+
+    if(event.path === '/static/hit') {
+        await getStaticAsset('static/hit.png', callback);
+    }
+
+    if(event.path === '/static/sunk') {
+        await getStaticAsset('static/sunk.png', callback);
     }
 
 };

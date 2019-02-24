@@ -5,8 +5,8 @@ describe('Player', () => {
 
     describe('#constructor()', () => {
 
-        it('sets the name correctly', () => {
-            let player = Player.loadFromFile('test/players/valid.js');
+        it('sets the name correctly', async () => {
+            let player = await Player.loadFromFile('test/players/Valid.js');
             assert.equal(player.name, 'Valid');
         });
 

@@ -3,13 +3,13 @@ const Coordinate = require('../Coordinate');
 const Game = require('../Game');
 const Player = require('../Player');
 
-describe('Player', () => {
+describe('Game', () => {
 
     describe('#turn()', () => {
 
-        beforeEach(() => {
-            this.player1 = Player.loadFromFile('test/players/valid.js');
-            this.player2 = Player.loadFromFile('test/players/valid.js');
+        beforeEach(async () => {
+            this.player1 = await Player.loadFromFile('test/players/Valid.js');
+            this.player2 = await Player.loadFromFile('test/players/Valid.js');
             this.game = new Game(this.player1, this.player2);
         });
 
@@ -125,9 +125,9 @@ describe('Player', () => {
 
     describe('#winner', () => {
 
-        beforeEach(() => {
-            this.player1 = Player.loadFromFile('test/players/valid.js');
-            this.player2 = Player.loadFromFile('test/players/valid.js');
+        beforeEach(async () => {
+            this.player1 = await Player.loadFromFile('test/players/Valid.js');
+            this.player2 = await Player.loadFromFile('test/players/Valid.js');
             this.game = new Game(this.player1, this.player2);
         });
 

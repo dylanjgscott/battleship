@@ -14,10 +14,7 @@
         "@babel/cli": "^7.2.3",
         "@babel/core": "^7.3.3",
         "@babel/preset-react": "^7.0.0",
-        "body-parser": "^1.18.3",
-        "express": "^4.16.4",
-        "mocha": "^5.2.0",
-        "nodemon": "^1.18.10"
+        "mocha": "^5.2.0"
     },
     "scripts": {
         "test": "mocha",
