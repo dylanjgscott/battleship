@@ -34,14 +34,26 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - apigateway:DELETE
+                  - apigateway:GET
+                  - apigateway:PATCH
+                  - apigateway:POST
+                  - cloudformation:CreateChangeSet
                   - iam:AttachRolePolicy
                   - iam:CreateRole
                   - iam:DeleteRole
                   - iam:DetachRolePolicy
                   - iam:GetRole
                   - iam:PassRole
+                  - lambda:AddPermission
                   - lambda:CreateFunction
                   - lambda:DeleteFunction
+                  - lambda:GetFunctionConfiguration
+                  - lambda:ListTags
+                  - lambda:RemovePermission
+                  - lambda:TagResource
+                  - lambda:UntagResource
+                  - lambda:UpdateFunctionConfiguration
                 Resource: '*'
             Version: 2012-10-17
           PolicyName: CloudFormation
@@ -78,7 +90,7 @@ Resources:
                 Version: 1
               Configuration:
                 ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_IAM
+                Capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM
                 RoleArn: !GetAtt CloudFormationRole.Arn
                 StackName: battleship
                 TemplatePath: battleship::battleship.yml
@@ -104,6 +116,7 @@ Resources:
                 Action:
                   - cloudformation:CreateStack
                   - cloudformation:DescribeStacks
+                  - cloudformation:UpdateStack
                 Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/battleship/*
               - Effect: Allow
                 Action: iam:PassRole

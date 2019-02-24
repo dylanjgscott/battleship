@@ -18,9 +18,14 @@ Resources:
             Path: /
       Handler: index.handler
       InlineCode: |
-        exports.handler = function(event, context) {
-          console.log(event);
-          console.log(context);
+        exports.handler = async function(event, context, callback) {
+          let response = {
+            isBase64Encoded: false,
+            statusCode: 200,
+            headers: { 'content-type': 'text/html' },
+            body: JSON.stringify(event),
+          }
+          callback(null, response);
         }
       Policies:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
