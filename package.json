@@ -3,7 +3,7 @@
     "version": "0.2.0",
     "description": "Battleship tournament",
     "author": "Dylan Scott",
-    "license": "BSD-3-Clause",
+    "license": "ISC",
     "dependencies": {
         "aws-sdk": "^2.408.0",
         "react": "^16.8.3",

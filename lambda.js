@@ -12,6 +12,8 @@ const PLAYER_DATABASE = 'battleship';
 
 async function handler(event, context) {
 
+    console.log(event);
+
     if(event.path === '/') {
         let players = await Player.loadFromDatabase(PLAYER_DATABASE);
         let page = React.createElement(MainPage, { players: players });
