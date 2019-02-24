@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Battleship deployment pipeline
+
+Parameters:
+
+  OAuthToken:
+    Type: String
+    Description: GitHub OAuth token
+
+Resources:
+
+  Bucket:
+    Type: AWS::S3::Bucket
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !Ref Bucket
+        Type: S3
+      RoleArn: !GetAtt Role.Arn
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: 1
+              Configuration:
+                Owner: dylanjgscott
+                Repo: battleship
+                PollForSourceChanges: false
+                Branch: master
+                OAuthToken: !Ref OAuthToken
+              Name: Source
+              OutputArtifacts:
+                - Name: battleship
+          Name: Build
+        - Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: 1
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn: !GetAtt Role.Arn
+                StackName: battleship
+                TemplatePath: battleship::battleship.yml
+              InputArtifacts:
+                - Name: battleship
+              Name: Deploy
+          Name: Deploy
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !GetAtt Bucket.Arn
+                  - !Sub ${Bucket.Arn}/*
+            Version: 2012-10-17
+          PolicyName: S3
+        - PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: CloudFormation
