@@ -16,8 +16,8 @@ Resources:
       Handler: index.handler
       Role: !GetAtt Role.Arn
       Runtime: nodejs8.10
-      Timeout: 5
-      MemorySize: 64
+      Timeout: 1
+      MemorySize: 128
 
   Role:
     Type: AWS::IAM::Role

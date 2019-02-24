@@ -7,11 +7,43 @@ Parameters:
   OAuthToken:
     Type: String
     Description: GitHub OAuth token
+    NoEcho: true
+
+  SecretToken:
+    Type: String
+    Description: GitHub Webhook token
+    NoEcho: true
 
 Resources:
 
   Bucket:
     Type: AWS::S3::Bucket
+
+  CloudFormationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+        Version: 2012-10-17
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:DetachRolePolicy
+                  - iam:GetRole
+                  - lambda:CreateFunction
+                  - lambda:DeleteFunction
+                Resource: '*'
+            Version: 2012-10-17
+          PolicyName: CloudFormation
 
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -19,7 +51,7 @@ Resources:
       ArtifactStore:
         Location: !Ref Bucket
         Type: S3
-      RoleArn: !GetAtt Role.Arn
+      RoleArn: !GetAtt PipelineRole.Arn
       Stages:
         - Actions:
             - ActionTypeId:
@@ -36,7 +68,7 @@ Resources:
               Name: Source
               OutputArtifacts:
                 - Name: battleship
-          Name: Build
+          Name: Source
         - Actions:
             - ActionTypeId:
                 Category: Deploy
@@ -46,7 +78,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM
-                RoleArn: !GetAtt Role.Arn
+                RoleArn: !GetAtt CloudFormationRole.Arn
                 StackName: battleship
                 TemplatePath: battleship::battleship.yml
               InputArtifacts:
@@ -54,7 +86,7 @@ Resources:
               Name: Deploy
           Name: Deploy
 
-  Role:
+  PipelineRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -69,18 +101,32 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:DescribeStacks
+                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/battleship/*
+              - Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt CloudFormationRole.Arn
+              - Effect: Allow
+                Action:
                   - s3:GetObject
                   - s3:PutObject
                 Resource:
                   - !GetAtt Bucket.Arn
                   - !Sub ${Bucket.Arn}/*
             Version: 2012-10-17
-          PolicyName: S3
-        - PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - cloudformation:DescribeStacks
-                Resource: '*'
-            Version: 2012-10-17
-          PolicyName: CloudFormation
+          PolicyName: Pipeline
+
+  Webhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+        Authentication: GITHUB_HMAC
+        AuthenticationConfiguration:
+          SecretToken: !Ref SecretToken
+        Filters:
+          - JsonPath: ref
+            MatchEquals: refs/heads/master
+        RegisterWithThirdParty: true
+        TargetAction: Source
+        TargetPipeline: !Ref Pipeline
+        TargetPipelineVersion: !GetAtt Pipeline.Version
