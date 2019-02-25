@@ -69,8 +69,12 @@ Resources:
                   - apigateway:POST
                   - apigateway:PUT
                   - cloudformation:CreateChangeSet
+                  - cloudfront:CreateCloudFrontOriginAccessIdentity
                   - cloudfront:CreateDistribution
+                  - cloudfront:DeleteCloudFrontOriginAccessIdentity
                   - cloudfront:DeleteDistribution
+                  - cloudfront:GetCloudFrontOriginAccessIdentity
+                  - cloudfront:GetCloudFrontOriginAccessIdentityConfig
                   - cloudfront:GetDistribution
                   - cloudfront:TagResource
                   - cloudfront:UnTagResource
@@ -96,6 +100,12 @@ Resources:
                   - lambda:UntagResource
                   - lambda:UpdateFunctionCode
                   - lambda:UpdateFunctionConfiguration
+                  - s3:CreateBucket
+                  - s3:DeleteBucket
+                  - s3:DeleteBucketPolicy
+                  - s3:DeleteBucketWebsite
+                  - s3:PutBucketPolicy
+                  - s3:PutBucketWebsite
                 Effect: Allow
                 Resource: '*'
               - Action: s3:GetObject
@@ -157,13 +167,13 @@ Resources:
                 Capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM
                 ParameterOverrides: |
                   {
-                    "Bucket": {
+                    "CodeUriBucket": {
                       "Fn::GetArtifactAtt": [
                         "Build",
                         "BucketName"
                       ]
                     },
-                    "Key": {
+                    "CodeUriKey": {
                       "Fn::GetArtifactAtt": [
                         "Build",
                         "ObjectKey"

@@ -6,13 +6,13 @@ Transform: AWS::Serverless-2016-10-31
 
 Parameters:
 
-  Bucket:
+  CodeUriBucket:
     Type: String
-    Description: S3 bucket name containing code for Lambda function
+    Description: Bucket with code for Lambda function
 
-  Key:
+  CodeUriKey:
     Type: String
-    Description: S3 object key containing code for Lambda function
+    Description: Object with code for Lambda function
 
 Resources:
 
@@ -24,21 +24,45 @@ Resources:
       EndpointConfiguration: REGIONAL
       StageName: Prod
 
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Statement:
+          Action: s3:GetObject
+          Effect: Allow
+          Principal:
+            CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+          Resource: !Sub ${Bucket.Arn}/*
+        Version: 2012-10-17
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: Battleship
+
   Distribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Aliases:
           - battleship.dylanscott.com.au
+        CacheBehaviors:
+          - ForwardedValues:
+              QueryString: false
+            PathPattern: /static/*
+            TargetOriginId: Static
+            ViewerProtocolPolicy: redirect-to-https
         DefaultCacheBehavior:
-          AllowedMethods:
-            - DELETE
-            - GET
-            - HEAD
-            - OPTIONS
-            - PATCH
-            - POST
-            - PUT
+          AllowedMethods: [ DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT ]
           ForwardedValues:
             QueryString: true
           TargetOriginId: Battleship
@@ -52,12 +76,15 @@ Resources:
             DomainName: !Sub ${Api}.execute-api.${AWS::Region}.amazonaws.com
             Id: Battleship
             OriginPath: /Prod
+          - DomainName: !GetAtt Bucket.DomainName
+            Id: Static
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}
         PriceClass: PriceClass_All
         ViewerCertificate:
           AcmCertificateArn: arn:aws:acm:us-east-1:584259415401:certificate/a71b279e-eadf-4440-b2fa-78e91d8b7608
           MinimumProtocolVersion: TLSv1.2_2018
           SslSupportMethod: sni-only
-
 
   Function:
     Type: AWS::Serverless::Function
@@ -79,12 +106,6 @@ Resources:
             Method: GET
             Path: /match
             RestApiId: !Ref Api
-        Static:
-          Type: Api
-          Properties:
-            Method: GET
-            Path: /static/miss
-            RestApiId: !Ref Api
         Upload:
           Type: Api
           Properties:
@@ -93,8 +114,8 @@ Resources:
             RestApiId: !Ref Api
       Handler: lambda.handler
       CodeUri:
-        Bucket: !Ref Bucket
-        Key: !Ref Key
+        Bucket: !Ref CodeUriBucket
+        Key: !Ref CodeUriKey
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref Table

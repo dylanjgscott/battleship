@@ -10,28 +10,6 @@ const MatchPage = require('./components/MatchPage');
 
 const PLAYER_DATABASE = process.env.TABLE_NAME;
 
-function getStaticAsset(filename, callback) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filename, (err, data) => {
-            if(err) {
-                reject(err);
-            }
-            else {
-                callback(null, {
-                    body: data.toString('base64'),
-                    headers: { 'Content-Type': 'image/png' },
-                    isBase64Encoded: true,
-                    multiValueHeaders: {
-                        'Cache-Control': [ 'public', 'max-age=3600' ],
-                    },
-                    statusCode: 200,
-                });
-                resolve();
-            }
-        });
-    });
-}
-
 async function handler(event, context, callback) {
 
     console.log(JSON.stringify(event));
@@ -42,10 +20,8 @@ async function handler(event, context, callback) {
         callback(null, {
             body: ReactDOMServer.renderToString(page),
             headers: {
-                'Content-Type': 'text/html'
-            },
-            multiValueHeaders: {
-                'Cache-Control': [ 'public', 'max-age=0' ],
+                'Content-Type': 'text/html',
+                'Cache-Control': 'public, max-age=0',
             },
             statusCode: 200,
         });
@@ -58,9 +34,9 @@ async function handler(event, context, callback) {
         let page = React.createElement(MatchPage, { match: match });
         callback(null, {
             body: ReactDOMServer.renderToString(page),
-            headers: { 'Content-Type': 'text/html' },
-            multiValueHeaders: {
-                'Cache-Control': [ 'public', 'max-age=0' ],
+            headers: {
+                'Content-Type': 'text/html',
+                'Cache-Control': 'public, max-age=0',
             },
             statusCode: 200,
         });
@@ -78,24 +54,11 @@ async function handler(event, context, callback) {
         await Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
         callback(null, {
             headers: { location: '/' },
+            headers: {
+                'Cache-Control': 'must-revalidate, no-cache, no-store',
+            },
             statusCode: 303,
         });
-    }
-
-    if(event.path === '/static/ocean') {
-        await getStaticAsset('static/ocean.png', callback);
-    }
-
-    if(event.path === '/static/miss') {
-        await getStaticAsset('static/miss.png', callback);
-    }
-
-    if(event.path === '/static/hit') {
-        await getStaticAsset('static/hit.png', callback);
-    }
-
-    if(event.path === '/static/sunk') {
-        await getStaticAsset('static/sunk.png', callback);
     }
 
 };
