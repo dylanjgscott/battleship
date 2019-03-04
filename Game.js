@@ -1,28 +1,21 @@
 const assert = require('assert');
 const Coordinate = require('./Coordinate');
 const Ship = require('./Ship');
+const State = require('./State');
 
 class Game {
-
-    static freshState() {
-        return {
-            board: Array(10).fill().map(() => Array(10).fill('ocean')),
-            log: [],
-            ships: Object.keys(Ship.SHIPS),
-        }
-    }
 
     static initialisePlayer(player, opponent) {
         let p = {};
         p.player = player;
-        p.state = Game.freshState();
+        p.state = new State();
         try {
             player.vm.protect(opponent.name, 'opponent');
             player.vm.run('player.opponent = opponent');
             p.ships = Ship.loadShips(player.vm.run('player.ships'));
-            player.vm.protect(p.state, 'state');
         }
         catch(error) {
+            console.log(error);
             p.ships = {};
         }
         return p;
@@ -71,12 +64,15 @@ class Game {
         // play until someone wins
         while(true) {
             try {
+                // pass in a copy of the current state
+                this.currentPlayer.player.vm.protect(new State(this.currentPlayer.state), 'state');
                 // get the players shot
                 let shot = new Coordinate(this.currentPlayer.player.vm.run('player.shoot(state)'));
                 // take a turn
                 this.turn(shot);
             }
             catch(error) {
+                console.log(error);
                 return this.nextPlayer.player;
             }
             // opponent ships sunk
