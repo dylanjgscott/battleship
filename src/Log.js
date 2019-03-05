@@ -53,13 +53,20 @@ class Shot extends React.Component {
 
 class Entries extends React.Component {
     render() {
-        return this.props.entries.map(entry => {
+        return this.props.player1.entries.map((entry, index) => {
             if(entry.error || entry.shot ) {
                 return (
-                    <li>
-                        <Shot shot={entry.shot} state={entry.state} />
-                        <Error error={entry.error} />
-                        <Messages messages={entry.messages} />
+                    <li style={logLayout}>
+                        <div style={log}>
+                            <Shot shot={this.props.player1.entries[index].shot} state={this.props.player1.entries[index].state} />
+                            <Error error={this.props.player1.entries[index].error} />
+                            <Messages messages={this.props.player1.entries[index].messages} />
+                        </div>
+                        <div style={log}>
+                            <Shot shot={this.props.player2.entries[index].shot} state={this.props.player2.entries[index].state} />
+                            <Error error={this.props.player2.entries[index].error} />
+                            <Messages messages={this.props.player2.entries[index].messages} />
+                        </div>
                     </li>
                 );
             }
@@ -73,18 +80,9 @@ class Entries extends React.Component {
 class Log extends React.Component {
     render() {
         return (
-            <div style={logLayout}>
-                <div>
-                    <ol style={log}>
-                        <Entries entries={this.props.player2.entries} />
-                    </ol>
-                </div>
-                <div>
-                    <ol style={log}>
-                        <Entries entries={this.props.player1.entries} />
-                    </ol>
-                </div>
-            </div>
+            <ol>
+                <Entries player1={this.props.player1} player2={this.props.player2} />
+            </ol>
         );
     }
 }
