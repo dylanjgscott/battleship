@@ -182,9 +182,10 @@ Resources:
                   }
                 RoleArn: !GetAtt CloudFormationRole.Arn
                 StackName: battleship
-                TemplatePath: Build::cloudformation.yml
+                TemplatePath: Source::template.yml
               InputArtifacts:
                 - Name: Build
+                - Name: Source
 
   PipelineRole:
     Type: AWS::IAM::Role

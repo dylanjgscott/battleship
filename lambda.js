@@ -53,9 +53,9 @@ async function handler(event, context, callback) {
         form = querystring.parse(post);
         await Player.saveToDatabase(PLAYER_DATABASE, form.javascript);
         callback(null, {
-            headers: { location: '/' },
             headers: {
                 'Cache-Control': 'must-revalidate, no-cache, no-store',
+                'Location': '/',
             },
             statusCode: 303,
         });

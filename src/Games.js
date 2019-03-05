@@ -22,12 +22,12 @@ const Games = ({ games }) =>
                 <div>
                     <h5>{game.player1.player.name}'s Shots</h5>
                     <GameBoard player={game.player1} />
-                    <Log player={game.player1} />
+                    <Log log={game.player1.log} />
                 </div>
                 <div>
                     <h5>{game.player2.player.name}'s Shots</h5>
                     <GameBoard player={game.player2} />
-                    <Log player={game.player2} />
+                    <Log log={game.player2.log} />
                 </div>
             </div>
         </div>

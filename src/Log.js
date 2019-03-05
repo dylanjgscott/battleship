@@ -1,4 +1,5 @@
 const React = require('react');
+const Fragment = React.Fragment;
 
 const log = {
     textAlign: 'left',
@@ -6,11 +7,27 @@ const log = {
     margin: '1rem auto',
 };
 
-class LogEntries extends React.Component {
+class Errors extends React.Component {
     render() {
-        return this.props.log.map(log => (
+        return this.props.errors.map(error => (
+            <li>{error.name}: {error.message}</li>
+        ));
+    }
+}
+
+class Messages extends React.Component {
+    render() {
+        return this.props.messages.map(message => (
+            <li>{message}</li>
+        ));
+    }
+}
+
+class Shots extends React.Component {
+    render() {
+        return this.props.shots.map(shot => (
             <li>
-                ({log.shot.x},{log.shot.y}) {log.state}
+                ({shot.x},{shot.y}) {shot.state}
             </li>
         ));
     }
@@ -19,9 +36,17 @@ class LogEntries extends React.Component {
 class Log extends React.Component {
     render() {
         return (
-            <ol style={log}>
-                <LogEntries log={this.props.player.state.log} />
-            </ol>
+            <Fragment>
+                <ol style={log}>
+                    <Errors errors={this.props.log.errors} />
+                </ol>
+                <ol style={log}>
+                    <Messages messages={this.props.log.messages} />
+                </ol>
+                <ol style={log}>
+                    <Shots shots={this.props.log.shots} />
+                </ol>
+            </Fragment>
         );
     }
 }

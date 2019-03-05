@@ -1,5 +1,6 @@
 const assert = require('assert');
 const Coordinate = require('./Coordinate');
+const Log = require('./Log');
 const Ship = require('./Ship');
 const State = require('./State');
 
@@ -8,14 +9,16 @@ class Game {
     static initialisePlayer(player, opponent) {
         let p = {};
         p.player = player;
+        p.log = new Log();
         p.state = new State();
         try {
             player.vm.protect(opponent.name, 'opponent');
+            player.vm.protect(p.log, 'console');
             player.vm.run('player.opponent = opponent');
             p.ships = Ship.loadShips(player.vm.run('player.ships'));
         }
         catch(error) {
-            console.log(error);
+            p.log.addError(error);
             p.ships = {};
         }
         return p;
@@ -57,7 +60,7 @@ class Game {
             this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
         }
         // update log
-        this.currentPlayer.state.log.push({shot: shot, state: this.currentPlayer.state.board[shot.x][shot.y]});
+        this.currentPlayer.log.addShot(shot, this.currentPlayer.state.board[shot.x][shot.y]);
     }
 
     get winner() {
@@ -72,7 +75,7 @@ class Game {
                 this.turn(shot);
             }
             catch(error) {
-                console.log(error);
+                this.currentPlayer.log.addError(error);
                 return this.nextPlayer.player;
             }
             // opponent ships sunk
