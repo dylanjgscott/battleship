@@ -7,10 +7,18 @@ const log = {
     margin: '1rem auto',
 };
 
+const errors = {
+    color: 'red',
+};
+
+const messages = {
+    'font-family': 'monospace',
+};
+
 class Errors extends React.Component {
     render() {
         return this.props.errors.map(error => (
-            <li>{error.name}: {error.message}</li>
+            <li style={errors}>{error.name}: {error.message}</li>
         ));
     }
 }
@@ -18,7 +26,7 @@ class Errors extends React.Component {
 class Messages extends React.Component {
     render() {
         return this.props.messages.map(message => (
-            <li>{message}</li>
+            <li style={messages}>{message}</li>
         ));
     }
 }
