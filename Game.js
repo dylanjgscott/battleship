@@ -18,7 +18,7 @@ class Game {
             p.ships = Ship.loadShips(player.vm.run('player.ships'));
         }
         catch(error) {
-            p.log.addError(error);
+            p.log.error(error);
             p.ships = {};
         }
         return p;
@@ -60,7 +60,7 @@ class Game {
             this.currentPlayer.state.board[shot.x][shot.y] = 'miss';
         }
         // update log
-        this.currentPlayer.log.addShot(shot, this.currentPlayer.state.board[shot.x][shot.y]);
+        this.currentPlayer.log.shot(shot, this.currentPlayer.state.board[shot.x][shot.y]);
     }
 
     get winner() {
@@ -75,7 +75,7 @@ class Game {
                 this.turn(shot);
             }
             catch(error) {
-                this.currentPlayer.log.addError(error);
+                this.currentPlayer.log.error(error);
                 return this.nextPlayer.player;
             }
             // opponent ships sunk

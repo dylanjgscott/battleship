@@ -51,32 +51,28 @@ describe('Game', () => {
         });
 
         it('updates the log on miss', () => {
-            assert.equal(this.game.player1.log.shots.length, 0);
             let shot = new Coordinate({ x: 9, y: 9 });
             this.game.turn(shot);
-            assert.equal(this.game.player1.log.shots[0].x, shot.x);
-            assert.equal(this.game.player1.log.shots[0].y, shot.y);
-            assert.equal(this.game.player1.log.shots[0].state, 'miss');
+            assert.equal(this.game.player1.log.entries[0].shot.x, shot.x);
+            assert.equal(this.game.player1.log.entries[0].shot.y, shot.y);
+            assert.equal(this.game.player1.log.entries[0].state, 'miss');
         });
 
         it('updates the log on hit', () => {
-            assert.equal(this.game.player1.log.shots.length, 0);
             let shot = new Coordinate({ x: 0, y: 0 });
             this.game.turn(shot);
-            assert.equal(this.game.player1.log.shots[0].x, shot.x);
-            assert.equal(this.game.player1.log.shots[0].y, shot.y);
-            assert.equal(this.game.player1.log.shots[0].state, 'hit');
+            assert.equal(this.game.player1.log.entries[0].shot.x, shot.x);
+            assert.equal(this.game.player1.log.entries[0].shot.y, shot.y);
+            assert.equal(this.game.player1.log.entries[0].state, 'hit');
         });
 
         it('updates the log on sink', () => {
-            assert.equal(this.game.player1.log.shots.length, 0);
             this.game.turn(new Coordinate({ x: 0, y: 0 }));
             this.game.turn(new Coordinate({ x: 0, y: 1 }));
             this.game.turn(new Coordinate({ x: 0, y: 2 }));
             this.game.turn(new Coordinate({ x: 0, y: 3 }));
             this.game.turn(new Coordinate({ x: 0, y: 4 }));
-            assert.equal(this.game.player1.log.shots.length, 5);
-            assert.equal(this.game.player1.log.shots[4].state, 'sunk');
+            assert.equal(this.game.player1.log.entries[4].state, 'sunk');
         });
 
         it('updates the ships on sink', () => {
@@ -139,7 +135,7 @@ describe('Game', () => {
             let player2 = await Player.loadFromFile('test/players/Valid.js');
             let game = new Game(player1, player2);
             let winner = game.winner;
-            assert.equal(game.player1.log.errors[0].message, 'cannot shoot');
+            assert.equal(game.player1.log.entries[0].error.message, 'cannot shoot');
         });
 
         it('updates the log when a player throws an exception during ship placement', async () => {
@@ -147,14 +143,14 @@ describe('Game', () => {
             let player2 = await Player.loadFromFile('test/players/Valid.js');
             let game = new Game(player1, player2);
             let winner = game.winner;
-            assert.equal(game.player1.log.errors[0].message, 'cannot place ships');
+            assert.equal(game.player1.log.entries[0].error.message, 'cannot place ships');
         });
 
         it('updates the log when a player uses console.log', async () => {
             let player1 = await Player.loadFromFile('test/players/LogsMessages.js');
             let player2 = await Player.loadFromFile('test/players/Valid.js');
             let game = new Game(player1, player2);
-            assert.equal(game.player1.log.messages[0], 'Placing ships');
+            assert.equal(game.player1.log.entries[0].messages[0], 'Placing ships');
         });
 
     });

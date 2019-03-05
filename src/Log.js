@@ -1,5 +1,4 @@
 const React = require('react');
-const Fragment = React.Fragment;
 
 const log = {
     textAlign: 'left',
@@ -7,54 +6,85 @@ const log = {
     margin: '1rem auto',
 };
 
-const errors = {
-    color: 'red',
+const logLayout = {
+    clear: 'both',
+    display: 'flex',
+    justifyContent: 'space-between',
 };
 
-const messages = {
-    'font-family': 'monospace',
-};
-
-class Errors extends React.Component {
+class Error extends React.Component {
     render() {
-        return this.props.errors.map(error => (
-            <li style={errors}>{error.name}: {error.message}</li>
-        ));
+        if(this.props.error) {
+            return (
+                <p style={{color: 'red'}}>{this.props.error.name}: {this.props.error.message}</p>
+            );
+        }
+        else {
+            return null;
+        }
     }
 }
 
 class Messages extends React.Component {
     render() {
-        return this.props.messages.map(message => (
-            <li style={messages}>{message}</li>
-        ));
+        if(this.props.messages) {
+            return (
+                <pre>{this.props.messages.join('\n')}</pre>
+            );
+        }
+        else {
+            return null;
+        }
     }
 }
 
-class Shots extends React.Component {
+class Shot extends React.Component {
     render() {
-        return this.props.shots.map(shot => (
-            <li>
-                ({shot.x},{shot.y}) {shot.state}
-            </li>
-        ));
+        if(this.props.shot && this.props.state) {
+            return (
+                <p>({this.props.shot.x},{this.props.shot.y}) {this.props.state}</p>
+            );
+        }
+        else {
+            return null;
+        }
+    }
+}
+
+class Entries extends React.Component {
+    render() {
+        return this.props.entries.map(entry => {
+            if(entry.error || entry.shot ) {
+                return (
+                    <li>
+                        <Shot shot={entry.shot} state={entry.state} />
+                        <Error error={entry.error} />
+                        <Messages messages={entry.messages} />
+                    </li>
+                );
+            }
+            else {
+                return null;
+            }
+        });
     }
 }
 
 class Log extends React.Component {
     render() {
         return (
-            <Fragment>
-                <ol style={log}>
-                    <Errors errors={this.props.log.errors} />
-                </ol>
-                <ol style={log}>
-                    <Messages messages={this.props.log.messages} />
-                </ol>
-                <ol style={log}>
-                    <Shots shots={this.props.log.shots} />
-                </ol>
-            </Fragment>
+            <div style={logLayout}>
+                <div>
+                    <ol style={log}>
+                        <Entries entries={this.props.player2.entries} />
+                    </ol>
+                </div>
+                <div>
+                    <ol style={log}>
+                        <Entries entries={this.props.player1.entries} />
+                    </ol>
+                </div>
+            </div>
         );
     }
 }

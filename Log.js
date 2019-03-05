@@ -1,25 +1,39 @@
-class Log {
+class Entry {
 
     constructor() {
-        this.errors = [];
+        this.error = null;
         this.messages = [];
-        this.shots = [];
-    }
-
-    addError(error) {
-        this.errors.push(error);
-    }
-
-    addShot(shot, state) {
-        this.shots.push({
-            state: state,
-            x: shot.x,
-            y: shot.y,
-        });
+        this.shot = null;
+        this.state = null;
     }
 
     log(message) {
         this.messages.push(message);
+    }
+
+}
+
+class Log {
+
+    constructor() {
+        this.entries = [];
+        this.activeEntry = new Entry();
+        this.entries.push(this.activeEntry);
+    }
+
+    error(error) {
+        this.activeEntry.error = error;
+    }
+
+    log(message) {
+        this.activeEntry.log(message);
+    }
+
+    shot(shot, state) {
+        this.activeEntry.shot = shot;
+        this.activeEntry.state = state;
+        this.activeEntry = new Entry();
+        this.entries.push(this.activeEntry);
     }
 
 }
