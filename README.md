@@ -1,6 +1,6 @@
 # Battleship
 
-[https://battleship.core-web.presentation-layer.abc-dev.net.au](https://battleship.core-web.presentation-layer.abc-dev.net.au)
+[https://battleship.dylanscott.com.au/](https://battleship.dylanscott.com.au/)
 
 It's a [Battleship](<https://en.wikipedia.org/wiki/Battleship_(game)>) game
 where the players are written in Javascript.
