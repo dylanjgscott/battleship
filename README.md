@@ -5,7 +5,7 @@
 It's a [Battleship](<https://en.wikipedia.org/wiki/Battleship_(game)>) game
 where the players are written in Javascript.
 
-Yeah, it's ugly. Can you please help me make it look nice?
+Thanks to Tim H who made it beautiful.
 
 ## Write Your Own Player
 
